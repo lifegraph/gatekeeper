@@ -52,6 +52,7 @@ app.get('/:fbapp/fbid/:deviceid', function(req, res) {
 // First part of Facebook auth dance.
 app.get('/:fbapp/login', function (req, res){
   getApiKey(req.params.fbapp, function(apikeyobj) {
+    console.log(apikeyobj);
     var redirect_url = 'https://www.facebook.com/dialog/oauth?client_id=' + apikeyobj.api_key +
      '&redirect_uri=' + hostUrl + '/' + req.params.fbapp + '/perms' +
      '&scope=' + apikeyobj.permissions + '&state=authed'
@@ -239,8 +240,11 @@ function getApiKey(namespace, callback) {
 }
 
 function setApiKeys (namespace, apiKey, secretKey, permissions, callback) {
+  console.log('setting api keys');
   db.collection('api_keys', function(err, collection) {
-    collection.update({
+    console.log('err,');
+    console.log(err);
+    collection.update({'namespace': namespace}, {
       'namespace': namespace,
       'api_key': apiKey,
       'secret_key': secretKey,

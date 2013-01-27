@@ -12,6 +12,8 @@ html
         $.post('/#{namespace}/keys/' + apikey + '/' + secretkey + '/' + 'user_actions.music,friends_actions.music' , function(data) {
           $('#apikey').val('');
           $('#secretkey').val('');
+          console.log("post data:");
+          console.log(data);
         });
       }
 
