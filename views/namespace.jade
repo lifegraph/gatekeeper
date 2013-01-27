@@ -9,9 +9,12 @@ html
       function updateKeys() {
         var apikey = $('#apikey').val();
         var secretkey = $('#secretkey').val();
-        $.post('/#{namespace}/keys/' + apikey + '/' + secretkey + '/' + 'user_actions.music,friends_actions.music' , function(data) {
+        var permissions = $('#permissions').val();
+        $.post('/#{namespace}/keys/' + apikey + '/' + secretkey + '/' + permissions , function(data) {
           $('#apikey').val('');
           $('#secretkey').val('');
+          $('#permissions').val('');
+
           console.log("post data:");
           console.log(data);
         });
@@ -26,6 +29,9 @@ html
       div(class='textbox-div')
         | Secret Key: 
         input(type='text', id='secretkey')
+      div(class='textbox-div')
+        | Permissions: 
+        input(type='text', id='permissions', placeholder='user_actions.music,friends_actions.music,user.likes,friends.likes')
       div#button-div
         button(type='button', id='updatekeys', class='btn btn-primary', data-loading-text='Loading...', onclick='updateKeys();') Update
     #fbids
