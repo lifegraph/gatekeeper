@@ -176,6 +176,22 @@ app.get('/:fbapp/setupdevice', function(req, res) {
   });  
 });
 
+app.get('/:fbapp/sync/:deviceid', function(req, res) {
+  if (!req.session.access_token) {
+    console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT Basic info.")
+    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
+    return;
+  }
+  if (req.params.fbapp != req.session.fbapp) {
+    console.log("The session has an access token for app %s when the url requested is app %s.", req.session.fbapp, req.params.fbapp);
+    res.redirect('/' + req.params.fbapp + '/login');
+    return;
+  }
+  setFbId(req.params.fbapp, req.params.deviceid, req.session.user, function() {
+    res.send('Hey it probably worked!');
+  }) 
+});
+
 // Allows the user to log out of our system.
 app.get('/:fbapp/logout', function(req, res) {
   if (!req.session.access_token) {

@@ -14,5 +14,6 @@ html
     h3 Please tap your ID and refresh the page.
     ul
       each item in deviceIds
-        li #{item}
+        li 
+          a(href="/#{namespace}/sync/#{item.deviceid}") #{item.deviceid}
     
