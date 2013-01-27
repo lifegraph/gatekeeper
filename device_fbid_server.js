@@ -35,23 +35,23 @@ app.get('/:fbapp/admin', function(req, res) {
   });
 });
 
-app.post(':fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
+app.post('/:fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
  setApiKeys(req.params.fbapp, req.params.apikey, req.params.secretkey, req.params.perms, function() {
   res.send('okay.');
  });
 });
-app.get(':fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
+app.get('/:fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
   console.log(req.params.fbapp);
   console.log(req.params.apikey);
   console.log(req.params.secretkey);
   console.log(req.params.perms);
-  
+
  // setApiKeys(req.params.fbapp, req.params.apikey, req.params.secretkey, req.params.perms, function() {
   res.send('here: %s, %s, %s, %s', req.params.fbapp, req.params.apikey, req.params.secretkey, req.params.perms);
  // });
 });
 
-app.get(':fbapp/fbid/:deviceid', function(req, res) {
+app.get('/:fbapp/fbid/:deviceid', function(req, res) {
   console.log('retrieving id ' + req.params.deviceid + ' from app ' + req.params.fbapp);
   getFbId(req.params.fbapp, req.params.deviceid, function(fbid) {
     res.json(fbid);
@@ -60,7 +60,7 @@ app.get(':fbapp/fbid/:deviceid', function(req, res) {
 
 
 // First part of Facebook auth dance.
-app.get(':fbapp/login', function (req, res){
+app.get('/:fbapp/login', function (req, res){
   getApiKey(req.params.fbapp, function(apikeyobj) {
     var redirect_url = 'https://www.facebook.com/dialog/oauth?client_id=' + apikeyobj.api_key +
      '&redirect_uri=' + hostUrl + '/' + req.params.fbapp + '/perms' +
