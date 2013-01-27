@@ -22,6 +22,10 @@ app.configure(function(){
   app.use(express.favicon());
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
+  app.use(express.cookieParser());
+  app.use(express.cookieSession({
+    secret: 'fb-gate-keeper'
+  }));
   app.use(express.methodOverride());
   app.use(app.router);
   app.use('/public', express.static(path.join(__dirname, 'public')));
