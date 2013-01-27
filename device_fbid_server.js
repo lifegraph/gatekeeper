@@ -9,6 +9,7 @@ var express = require('express')
   , path = require('path');
 
 var app = express();
+var hostUrl = 'http://fb-gate-keeper.herokuapp.com'
 
 var db; // Database opened later
 
