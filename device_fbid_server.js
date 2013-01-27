@@ -42,12 +42,12 @@ app.get('/:fbapp/admin', function(req, res) {
 });
 
 app.post('/:fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
- setApiKeys(req.params.fbapp, req.params.apikey, req.params.secretkey, req.params.perms, function() {
-  res.send('okay.');
- });
+  setApiKeys(req.params.fbapp, req.params.apikey, req.params.secretkey, req.params.perms, function() {
+    res.send('okay.');
+  });
 });
 
-app.get('/:fbapp/fbid/:deviceid', function(req, res) {
+app.get('/:fbapp/user/:deviceid', function(req, res) {
   console.log('retrieving id ' + req.params.deviceid + ' from app ' + req.params.fbapp);
   getFbId(req.params.fbapp, req.params.deviceid, function(fbid) {
     res.json(fbid);
