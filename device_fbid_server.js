@@ -50,7 +50,13 @@ app.post('/:fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
 app.get('/:fbapp/user/:deviceid', function(req, res) {
   console.log('retrieving id ' + req.params.deviceid + ' from app ' + req.params.fbapp);
   getFbId(req.params.fbapp, req.params.deviceid, function(fbid) {
-    res.json(fbid);
+    if (fbid != null) {
+      res.json(fbid);
+    } else {
+      setFbId(req.params.fbapp, req.params.deviceid, null, function() {
+        res.json({error:"Device ID not associated with Facebook user."});
+      })
+    }
   });
 });
 
@@ -165,7 +171,9 @@ app.get('/:fbapp/setupdevice', function(req, res) {
     res.redirect('/' + req.params.fbapp + '/login');
     return;
   }
-  res.render('setupdevice.jade', {namespace: req.params.fbapp});
+  getUnclaimedDeviceIds(req.params.fbapp, function(deviceIds) {
+    res.render('setupdevice.jade', {namespace: req.params.fbapp, deviceIds: deviceIds});
+  });  
 });
 
 // Allows the user to log out of our system.
@@ -205,13 +213,12 @@ Db.connect(app.get('dburl'), {}, function (err, _db) {
 /* Database opoerations */
 
 
-function saveFbId (namespace, deviceid, fbid, callback) {
+function setFbId (namespace, deviceid, fbid, callback) {
   db.collection(namespace, function(err, collection) {
-    collection.insert({
+    collection.update({'deviceid': deviceid}, {
       'deviceid': deviceid,
       'fbid': fbid
-    });
-    callback();
+    }, {safe: true, upsert: true}, callback);
   });
 }
 
@@ -221,6 +228,16 @@ function getFbId(namespace, deviceid, callback) {
       'deviceid': deviceid,
     }, function(err, item) {
         callback(item);
+    });
+  });
+}
+
+function getUnclaimedDeviceIds(namespace, callback) {
+  db.collection(namespace, function (err, collection) {
+    collection.find({'fbid': null}, function (err, cursor) {
+      cursor.toArray(function(err, items) {
+        callback(items);
+      });
     });
   });
 }
@@ -249,8 +266,6 @@ function getApiKey(namespace, callback) {
 function setApiKeys (namespace, apiKey, secretKey, permissions, callback) {
   console.log('setting api keys');
   db.collection('api_keys', function(err, collection) {
-    console.log('err,');
-    console.log(err);
     collection.update({'namespace': namespace}, {
       'namespace': namespace,
       'api_key': apiKey,
