@@ -4,6 +4,7 @@
 
 var express = require('express')
   , http = require('http')
+  , https = require('https')
   , mongo = require('mongodb')
   , Db = mongo.Db
   , path = require('path');
