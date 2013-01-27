@@ -49,9 +49,9 @@ app.post('/:fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
 
 app.get('/:fbapp/user/:deviceid', function(req, res) {
   console.log('retrieving id ' + req.params.deviceid + ' from app ' + req.params.fbapp);
-  getFbId(req.params.fbapp, req.params.deviceid, function(fbid) {
-    if (fbid != null) {
-      res.json(fbid);
+  getFbId(req.params.fbapp, req.params.deviceid, function(item) {
+    if (item != null) {
+      res.json(item.fbuser);
     } else {
       setFbId(req.params.fbapp, req.params.deviceid, null, function() {
         res.json({error:"Device ID not associated with Facebook user."});
@@ -229,11 +229,11 @@ Db.connect(app.get('dburl'), {}, function (err, _db) {
 /* Database opoerations */
 
 
-function setFbId (namespace, deviceid, fbid, callback) {
+function setFbId (namespace, deviceid, fbuser, callback) {
   db.collection(namespace, function(err, collection) {
     collection.update({'deviceid': deviceid}, {
       'deviceid': deviceid,
-      'fbid': fbid
+      'fbuser': fbuser
     }, {safe: true, upsert: true}, callback);
   });
 }
@@ -250,7 +250,7 @@ function getFbId(namespace, deviceid, callback) {
 
 function getUnclaimedDeviceIds(namespace, callback) {
   db.collection(namespace, function (err, collection) {
-    collection.find({'fbid': null}, function (err, cursor) {
+    collection.find({'fbuser': null}, function (err, cursor) {
       cursor.toArray(function(err, items) {
         callback(items);
       });
