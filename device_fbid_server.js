@@ -40,6 +40,16 @@ app.post(':fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
   res.send('okay.');
  });
 });
+app.get(':fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
+  console.log(req.params.fbapp);
+  console.log(req.params.apikey);
+  console.log(req.params.secretkey);
+  console.log(req.params.perms);
+  
+ // setApiKeys(req.params.fbapp, req.params.apikey, req.params.secretkey, req.params.perms, function() {
+  res.send('here: %s, %s, %s, %s', req.params.fbapp, req.params.apikey, req.params.secretkey, req.params.perms);
+ // });
+});
 
 app.get(':fbapp/fbid/:deviceid', function(req, res) {
   console.log('retrieving id ' + req.params.deviceid + ' from app ' + req.params.fbapp);
