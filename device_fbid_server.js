@@ -146,6 +146,7 @@ app.get('/:fbapp/basicinfo', function(req, res) {
 
       fbres.on('end', function() {
         console.log("%s/basicinfo output:", req.params.fbapp);
+        console.log(output);
         req.session.user = getReducedUser(JSON.parse(output));
         console.log(JSON.stringify(req.session.user, undefined, 2));
         res.redirect('/' + req.params.fbapp + '/setupdevice');
