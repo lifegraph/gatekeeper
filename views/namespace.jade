@@ -10,10 +10,12 @@ html
         var apikey = $('#apikey').val();
         var secretkey = $('#secretkey').val();
         var permissions = $('#permissions').val();
-        $.post('/#{namespace}/keys/' + apikey + '/' + secretkey + '/' + permissions , function(data) {
+        var callbackurl = $('#callbackurl').val();
+        $.post('/#{namespace}/keys/' + apikey + '/' + secretkey + '/' + permissions + '/' + encodeURIComponent(callbackurl) , function(data) {
           $('#apikey').val('');
           $('#secretkey').val('');
           $('#permissions').val('');
+          $('#callbackurl').val('');
 
           console.log("post data:");
           console.log(data);
@@ -32,6 +34,9 @@ html
       div(class='textbox-div')
         | Permissions: 
         input(type='text', id='permissions', placeholder='user_actions.music,friends_actions.music,user_likes,friends_likes')
+      div(class='textbox-div')
+        | Login Callback URL: 
+        input(type='text', id='callbackurl')
       div#button-div
         button(type='button', id='updatekeys', class='btn btn-primary', data-loading-text='Loading...', onclick='updateKeys();') Update
     #fbids

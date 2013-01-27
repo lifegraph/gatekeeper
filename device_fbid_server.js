@@ -41,8 +41,8 @@ app.get('/:fbapp/admin', function(req, res) {
   });
 });
 
-app.post('/:fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
-  setApiKeys(req.params.fbapp, req.params.apikey, req.params.secretkey, req.params.perms, function() {
+app.post('/:fbapp/keys/:apikey/:secretkey/:perms/:callback', function(req, res) {
+  setApiKeys(req.params.fbapp, req.params.apikey, req.params.secretkey, req.params.perms, decodeURIComponent(req.params.callback), function() {
     res.send('okay.');
   });
 });
@@ -188,8 +188,10 @@ app.get('/:fbapp/sync/:deviceid', function(req, res) {
     return;
   }
   setFbId(req.params.fbapp, req.params.deviceid, req.session.user, function() {
-    res.send('Hey it probably worked!');
-  }) 
+    getApiKey(req.params.fbapp, function(apikeyobj) {
+      res.redirect(apikeyobj.callback_url);
+    });
+  });
 });
 
 // Allows the user to log out of our system.
@@ -279,14 +281,15 @@ function getApiKey(namespace, callback) {
   });
 }
 
-function setApiKeys (namespace, apiKey, secretKey, permissions, callback) {
+function setApiKeys (namespace, apiKey, secretKey, permissions, callbackUrl, callback) {
   console.log('setting api keys');
   db.collection('api_keys', function(err, collection) {
     collection.update({'namespace': namespace}, {
       'namespace': namespace,
       'api_key': apiKey,
       'secret_key': secretKey,
-      'permissions': permissions
+      'permissions': permissions,
+      'callback_url': callbackUrl
     }, {safe: true, upsert: true}, callback);
   });
 }
