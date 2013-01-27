@@ -32,7 +32,7 @@ app.configure('development', function(){
 app.get('/:fbapp/admin', function(req, res) {
   getAllFbIds(req.params.fbapp, function(fbids) {
     res.render('namespace', {namespace:req.params.fbapp, fbids: fbids});
-  })
+  });
 });
 
 app.post(':fbapp/keys/:apikey/:secretkey/:perms', function(req, res) {
