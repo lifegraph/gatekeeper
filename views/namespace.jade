@@ -39,5 +39,7 @@ html
         input(type='text', id='callbackurl')
       div#button-div
         button(type='button', id='updatekeys', class='btn btn-primary', data-loading-text='Loading...', onclick='updateKeys();') Update
-    #fbids
-      | #{fbids}
+    ul#fbusers
+      each fbuser in fbusers
+        li 
+          a(href="#{fbuser.link}") #{fbuser.name}
