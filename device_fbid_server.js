@@ -37,6 +37,8 @@ app.configure('development', function(){
 
 app.get('/:fbapp/admin', function(req, res) {
   getAllFbUsers(req.params.fbapp, function(fbusers) {
+    console.log("users:");
+    console.log(JSON.stringify(fbusers, undefined, 2));
     res.render('namespace', {namespace:req.params.fbapp, fbusers: fbusers});
   });
 });
