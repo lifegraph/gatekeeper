@@ -36,8 +36,8 @@ app.configure('development', function(){
 });
 
 app.get('/:fbapp/admin', function(req, res) {
-  getAllFbIds(req.params.fbapp, function(fbids) {
-    res.render('namespace', {namespace:req.params.fbapp, fbids: fbids});
+  getAllFbUsers(req.params.fbapp, function(fbusers) {
+    res.render('namespace', {namespace:req.params.fbapp, fbusers: fbusers});
   });
 });
 
@@ -49,11 +49,11 @@ app.post('/:fbapp/keys/:apikey/:secretkey/:perms/:callback', function(req, res) 
 
 app.get('/:fbapp/user/:deviceid', function(req, res) {
   console.log('retrieving id ' + req.params.deviceid + ' from app ' + req.params.fbapp);
-  getFbId(req.params.fbapp, req.params.deviceid, function(item) {
+  getFbUser(req.params.fbapp, req.params.deviceid, function(item) {
     if (item != null) {
       res.json(item.fbuser);
     } else {
-      setFbId(req.params.fbapp, req.params.deviceid, null, function() {
+      setFbUser(req.params.fbapp, req.params.deviceid, null, function() {
         res.json({error:"Device ID not associated with Facebook user."});
       })
     }
@@ -162,13 +162,18 @@ app.get('/:fbapp/basicinfo', function(req, res) {
 
 app.get('/:fbapp/setupdevice', function(req, res) {
   if (!req.session.access_token) {
-    console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT Basic info.")
+    console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT setupdevice.")
     res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
     return;
   }
   if (req.params.fbapp != req.session.fbapp) {
     console.log("The session has an access token for app %s when the url requested is app %s.", req.session.fbapp, req.params.fbapp);
     res.redirect('/' + req.params.fbapp + '/login');
+    return;
+  }
+  if (!req.session.user) {
+    console.log("NO " + req.params.fbapp + " USER AT setupdevice.")
+    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
     return;
   }
   getUnclaimedDeviceIds(req.params.fbapp, function(deviceIds) {
@@ -187,7 +192,7 @@ app.get('/:fbapp/sync/:deviceid', function(req, res) {
     res.redirect('/' + req.params.fbapp + '/login');
     return;
   }
-  setFbId(req.params.fbapp, req.params.deviceid, req.session.user, function() {
+  setFbUser(req.params.fbapp, req.params.deviceid, req.session.user, function() {
     getApiKey(req.params.fbapp, function(apikeyobj) {
       res.redirect(apikeyobj.callback_url);
     });
@@ -231,7 +236,7 @@ Db.connect(app.get('dburl'), {}, function (err, _db) {
 /* Database opoerations */
 
 
-function setFbId (namespace, deviceid, fbuser, callback) {
+function setFbUser (namespace, deviceid, fbuser, callback) {
   db.collection(namespace, function(err, collection) {
     collection.update({'deviceid': deviceid}, {
       'deviceid': deviceid,
@@ -240,7 +245,7 @@ function setFbId (namespace, deviceid, fbuser, callback) {
   });
 }
 
-function getFbId(namespace, deviceid, callback) {
+function getFbUser(namespace, deviceid, callback) {
   db.collection(namespace, function (err, collection) {
     collection.findOne({
       'deviceid': deviceid,
@@ -260,7 +265,7 @@ function getUnclaimedDeviceIds(namespace, callback) {
   });
 }
 
-function getAllFbIds(namespace, callback) {
+function getAllFbUsers(namespace, callback) {
   db.collection(namespace, function (err, collection) {
     collection.find({}, function (err, cursor) {
       cursor.toArray(function(err, items) {
