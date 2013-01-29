@@ -162,7 +162,7 @@ app.get('/:fbapp/basicinfo', function(req, res) {
   });
 });
 
-app.get('/:fbapp/userFacebookID/token', function(req, res) {
+app.get('/:fbapp/:userFacebookID/token', function(req, res) {
   if (!req.session.access_token) {
     res.send( {'error' : 'No Access Token Stored in GateKeeper'});
   } else {
