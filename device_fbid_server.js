@@ -55,7 +55,7 @@ app.post('/:fbapp/keys/:apikey/:secretkey/:perms/:callback', function(req, res) 
 app.get('/:fbapp/user/:deviceid', function(req, res) {
   console.log('retrieving id ' + req.params.deviceid + ' from app ' + req.params.fbapp);
   getFbUser(req.params.fbapp, req.params.deviceid, function(item) {
-    if (item != null) {
+    if (item != null && item.fbuser != null) {
       res.json(item.fbuser);
     } else {
       setFbUser(req.params.fbapp, req.params.deviceid, null, function() {
