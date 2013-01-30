@@ -36,10 +36,8 @@ app.configure('development', function(){
 });
 
 app.get('/:fbapp/admin', function(req, res) {
-  getAllFbUsers(req.params.fbapp, function(fbusers) {
-    console.log("users:");
-    console.log(JSON.stringify(fbusers, undefined, 2));
-    res.render('namespace', {namespace:req.params.fbapp, fbusers: fbusers});
+  getAllFbUsers(req.params.fbapp, function(dbitems) {
+    res.render('namespace', {namespace:req.params.fbapp, fbusers: dbitems.map(function(dbitem) { return dbitem.fbuser; })});
   });
 });
 
@@ -155,7 +153,7 @@ app.get('/:fbapp/basicinfo', function(req, res) {
       fbres.on('end', function() {
         console.log("%s/basicinfo output:", req.params.fbapp);
         console.log(output);
-        req.session.user = getReducedUser(JSON.parse(output));
+        req.session.user = getReducedUser(JSON.parse(output), req.session.access_token);
         console.log(JSON.stringify(req.session.user, undefined, 2));
         res.redirect('/' + req.params.fbapp + '/setupdevice');
       });
@@ -306,6 +304,6 @@ function setApiKeys (namespace, apiKey, secretKey, permissions, callbackUrl, cal
 
 // Returns a user object that only has the elements that we care about from the user
 // This solves the problem of cookies being too big to store
-function getReducedUser(user) {
-  return {id: user.id, name: user.name, first_name: user.first_name, last_name: user.last_name, link: user.link, username: user.username};
+function getReducedUser(user, access_token) {
+  return {id: user.id, name: user.name, first_name: user.first_name, last_name: user.last_name, link: user.link, username: user.username, access_token: access_token};
 }
