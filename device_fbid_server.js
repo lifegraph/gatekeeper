@@ -160,6 +160,9 @@ app.get('/:fbapp/basicinfo', function(req, res) {
   });
 });
 
+// I don't think this will work because the session variable is set on the browser when
+// the user is logging into the app, which will not be present when a server or hardware
+// queries this endpoint. I added the access_token as a field in the fbuser object. -Paul
 app.get('/:fbapp/:userFacebookID/token', function(req, res) {
   if (!req.session.access_token) {
     res.send( {'error' : 'No Access Token Stored in GateKeeper'});
