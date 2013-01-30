@@ -40,7 +40,7 @@ app.get('/:fbapp/admin', function(req, res) {
     console.log("ADMIN:");
     console.log(JSON.stringify(dbitems, undefined, 2));
     console.log("USERs:");
-    var fbusers = dbitems.map(function(dbitem) { return dbitem.fbuser; });
+    var fbusers = dbitems.map(function(dbitem) { return dbitem.fbuser; }).filter(Boolean);
     console.log(JSON.stringify(fbusers, undefined, 2));
     res.render('namespace', {namespace:req.params.fbapp, fbusers: fbusers});
   });
