@@ -37,7 +37,9 @@ app.configure('development', function(){
 
 app.get('/:fbapp/admin', function(req, res) {
   getAllFbUsers(req.params.fbapp, function(dbitems) {
-    res.render('namespace', {namespace:req.params.fbapp, fbusers: dbitems.map(function(dbitem) { return dbitem.fbuser; })});
+    var fbusers = dbitems.map(function(dbitem) { return dbitem.fbuser; });
+    console.log(JSON.stringify(fbusers, undefined, 2));
+    res.render('namespace', {namespace:req.params.fbapp, fbusers: fbusers});
   });
 });
 
