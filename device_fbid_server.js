@@ -160,6 +160,14 @@ app.get('/:fbapp/basicinfo', function(req, res) {
   });
 });
 
+app.get('/:fbapp/:userFacebookID/token', function(req, res) {
+  if (!req.session.access_token) {
+    res.send( {'error' : 'No Access Token Stored in GateKeeper'});
+  } else {
+    res.send( {'access_token' : req.session.access_token});
+  }
+});
+
 app.get('/:fbapp/setupdevice', function(req, res) {
   if (!req.session.access_token) {
     console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT setupdevice.")
