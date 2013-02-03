@@ -105,7 +105,7 @@ app.get('/:fbapp/login', function (req, res){
       });
     }
   });
-}
+});
 
 // Response from Facebook with user permissions.
 app.get('/:fbapp/perms', function (req, res){
