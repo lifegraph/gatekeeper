@@ -20,14 +20,10 @@ html
         h1 Sync your Device With Your Facebook Account
     if (deviceIds)
       h3 Found your device!
-        
-
-
-    h1 Set your device ID for #{namespace}
-    h3 Please tap your ID and refresh the page.
-    h3 Here are some unused IDs that were tapped recently.
-    ul
       each item in deviceIds
         li 
-          a(href="/#{namespace}/sync/#{item.deviceid}") #{item.deviceid}
+          a(href="/#{namespace}/sync/#{item.deviceid}") #{Click here to sync your device}
+    else
+      h3 No devices found. Please tap your device, then refresh your browser.
+
     
