@@ -2,6 +2,7 @@ html
   head
     title #{namespace}
     script(src='//code.jquery.com/jquery-1.9.0.min.js')
+    link(rel='stylesheet', href=/css/bootstrap.css")
     link(rel='stylesheet', href='//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css')
     link(rel='stylesheet', href='//netdna.bootstrapcdn.com/bootswatch/2.1.1/readable/bootstrap.min.css')
     script(src='//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js')
@@ -13,7 +14,10 @@ html
     div.navbar.navbar-inverse.navbar-fixed-top
       div.navbar-inner
         div.container-fluid
-          a.brand Entrance
+          a.brand(href="#") Entrance
+    div.container
+      div.page-header
+        h1 Sync your Device
     h1 Set your device ID for #{namespace}
     h3 Please tap your ID and refresh the page.
     h3 Here are some unused IDs that were tapped recently.
