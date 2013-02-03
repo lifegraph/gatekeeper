@@ -39,6 +39,7 @@ app.configure('development', function(){
 app.get('/', function(request, response) {
   console.log("Hit root");
   fs.readFile(__dirname + '/public/html/index.html', 'utf8', function(err, text){
+      console.log("TEXT: " + text);
        response.send(text);
    });
 });
