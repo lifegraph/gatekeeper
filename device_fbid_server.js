@@ -17,7 +17,7 @@ var db; // Database opened later
 
 app.configure(function(){
   app.set('port', process.env.PORT || 3000);
-  app.set('dburl', process.env.MONGOLAB_URI || 'mongodb://localhost:27017/forcexercise');
+  app.set('dburl', process.env.MONGOLAB_URI || 'mongodb://localhost:27017/gate-keeper');
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
@@ -38,6 +38,7 @@ app.configure('development', function(){
 
 app.get('/', function(request, response) {
   console.log("Hit root");
+  console.log("DIR" + __dirname);
   fs.readFile(__dirname + '/public/html/index.html', 'utf8', function(err, text){
       console.log("TEXT: " + text);
        response.send(text);
