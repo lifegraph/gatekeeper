@@ -1,6 +1,6 @@
 html
   head
-    title Set your device ID for #{namespace}
+    title #{namespace}
     script(src='//code.jquery.com/jquery-1.9.0.min.js')
     link(rel='stylesheet', href='//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css')
     link(rel='stylesheet', href='//netdna.bootstrapcdn.com/bootswatch/2.1.1/readable/bootstrap.min.css')
@@ -10,6 +10,10 @@ html
 
       }
   body
+    div.navbar.navbar-inverse.navbar-fixed-top
+      div.navbar-inner
+        div.container-fluid
+          a.brand Entrance
     h1 Set your device ID for #{namespace}
     h3 Please tap your ID and refresh the page.
     h3 Here are some unused IDs that were tapped recently.
