@@ -88,9 +88,11 @@ app.get('/:fbapp/login', function (req, res){
   getFbUser(req.params.fbapp, req.params.deviceid, function(item) {
     // If we already auth'ed this user, send them to the entrance app to edit
     // their prefs, otherwise to sync page
+    console.log("ITEM: " + item);
+    console.log("USER: " + item.fbuser)
     if (item != null && item.fbuser != null) {
       // TODO: Make this more modular so other apps can use it. In a rush at a hackathon though.
-        res.redirect('entranceapp.herokuapp.com/');
+        res.redirect('http://entranceapp.herokuapp.com/');
     } 
     else {
       getApiKey(req.params.fbapp, function(apikeyobj) {
@@ -98,9 +100,6 @@ app.get('/:fbapp/login', function (req, res){
         var redirect_url = 'https://www.facebook.com/dialog/oauth?client_id=' + apikeyobj.api_key +
          '&redirect_uri=' + hostUrl + '/' + req.params.fbapp + '/perms' +
          '&scope=' + apikeyobj.permissions + '&state=authed'
-        // console.log("REDIRECTIN' From /")
-        // console.log(redirect_url);
-        // console.log("REQUEST HEADERS:" + JSON.stringify(req.headers));
         res.redirect(redirect_url);
       });
     }
