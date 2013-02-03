@@ -179,8 +179,14 @@ app.get('/:fbapp/basicinfo', function(req, res) {
         console.log(JSON.stringify(req.session.user, undefined, 2));
 
         getDeviceId(req.params.fbapp, req.session.user, function (item) {
-          if (item) res.redirect('http://entranceapp.herokuapp.com');
-          else res.redirect('/' + req.params.fbapp + '/setupdevice');
+          if (item) {
+            console.log("Redirecting to entrance app");
+            res.redirect('http://entranceapp.herokuapp.com');
+        }
+          else { 
+            console.log("Redirecting to set up");
+            res.redirect('/' + req.params.fbapp + '/setupdevice');
+        }
         });
       });
   });
