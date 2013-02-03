@@ -7,7 +7,8 @@ var express = require('express')
   , https = require('https')
   , mongo = require('mongodb')
   , Db = mongo.Db
-  , path = require('path');
+  , path = require('path')
+  , fs = require('fs');
 
 var app = express();
 var hostUrl = 'http://fb-gate-keeper.herokuapp.com'
@@ -35,6 +36,13 @@ app.configure('development', function(){
   app.use(express.errorHandler());
 });
 
+app.get('/', function(request, response) {
+  console.log("Hit root");
+  fs.readFile(__dirname + '/public/html/index.html', 'utf8', function(err, text){
+       response.send(text);
+   });
+});
+
 app.get('/:fbapp/admin', function(req, res) {
   getAllFbUsers(req.params.fbapp, function(dbitems) {
     console.log("ADMIN:");
@@ -44,6 +52,13 @@ app.get('/:fbapp/admin', function(req, res) {
     console.log(JSON.stringify(fbusers, undefined, 2));
     res.render('namespace', {namespace:req.params.fbapp, fbusers: fbusers});
   });
+});
+
+app.get('/', function(request, response) {
+  console.log("Hit root");
+ fs.readFile(__dirname + '/views/index.html', 'utf8', function(err, text){
+       response.send(text);
+   });
 });
 
 app.post('/:fbapp/keys/:apikey/:secretkey/:perms/:callback', function(req, res) {
