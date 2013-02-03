@@ -182,7 +182,6 @@ app.get('/:fbapp/basicinfo', function(req, res) {
           if (item) res.redirect('http://entranceapp.herokuapp.com');
           else res.redirect('/' + req.params.fbapp + '/setupdevice');
         });
-        res.redirect('/' + req.params.fbapp + '/setupdevice');
       });
   });
 });
