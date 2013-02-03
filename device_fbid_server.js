@@ -209,6 +209,7 @@ app.get('/:fbapp/setupdevice', function(req, res) {
     return;
   }
   getUnclaimedDeviceIds(req.params.fbapp, function(deviceIds) {
+    console.log({namespace: req.params.fbapp, deviceIds: deviceIds});
     res.render('setupdevice.jade', {namespace: req.params.fbapp, deviceIds: deviceIds});
   });  
 });
