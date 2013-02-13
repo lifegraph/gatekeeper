@@ -7,11 +7,12 @@ html
     script(src='//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js')
     script(type='text/javascript')
       function updateKeys() {
-        var apikey = $('#apikey').val();
-        var secretkey = $('#secretkey').val();
-        var permissions = $('#permissions').val();
-        var callbackurl = $('#callbackurl').val();
-        $.post('/#{namespace}/keys/' + apikey + '/' + secretkey + '/' + permissions + '/' + encodeURIComponent(callbackurl) , function(data) {
+        $.post('/#{namespace}/keys', {
+          apikey: $('#apikey').val(),
+          secretkey: $('#secretkey').val(),
+          permissions: $('#permissions').val()
+          callbackurl: $('#callbackurl').val()
+        }, function(data) {
           $('#apikey').val('');
           $('#secretkey').val('');
           $('#permissions').val('');

@@ -47,9 +47,12 @@ app.configure('production', function () {
  */
 
 app.get('/', function (req, res) {
-  console.log("Hit root");
-  res.render('index', {title: 'Lifegraph Connect'});
+  getApps(function (apis) {
+    res.render('index', {title: 'Lifegraph Connect', apps: apis});
+  });
 });
+
+// Administration control panel.
 
 app.get('/:fbapp/admin', function (req, res) {
   getAllFbUsers(req.params.fbapp, function (dbitems) {
@@ -62,22 +65,11 @@ app.get('/:fbapp/admin', function (req, res) {
   });
 });
 
-app.post('/:fbapp/keys/:apikey/:secretkey/:perms/:callback', function (req, res) {
-  setApiKeys(req.params.fbapp, req.params.apikey, req.params.secretkey, req.params.perms, decodeURIComponent(req.params.callback), function () {
-    res.send('okay.');
-  });
-});
+// Set the API keys.
 
-app.get('/:fbapp/user/:deviceid', function (req, res) {
-  console.log('retrieving id ' + req.params.deviceid + ' from app ' + req.params.fbapp);
-  getFbUser(req.params.fbapp, req.params.deviceid, function (item) {
-    if (item != null && item.fbuser != null) {
-      res.json(item.fbuser);
-    } else {
-      setFbUser(req.params.fbapp, req.params.deviceid, null, function () {
-        res.json({error:"Device ID not associated with Facebook user."});
-      })
-    }
+app.post('/:fbapp/keys', function (req, res) {
+  setApiKeys(req.params.fbapp, req.query.apikey, req.query.secretkey, req.query.perms, decodeURIComponent(req.query.callback), function () {
+    res.send('okay.');
   });
 });
 
@@ -167,29 +159,29 @@ app.get('/:fbapp/basicinfo', function (req, res) {
       path: '/me?access_token=' + req.session.access_token
     };
   https.get(options, function (fbres) {
-      var output = '';
-      fbres.on('data', function (chunk) {
-          //console.log("CHUNK:" + chunk);
-          output += chunk;
-      });
+    var output = '';
+    fbres.on('data', function (chunk) {
+        //console.log("CHUNK:" + chunk);
+        output += chunk;
+    });
 
-      fbres.on('end', function () {
-        console.log("%s/basicinfo output:", req.params.fbapp);
-        console.log(output);
-        req.session.user = getReducedUser(JSON.parse(output), req.session.access_token);
-        console.log(JSON.stringify(req.session.user, undefined, 2));
+    fbres.on('end', function () {
+      console.log("%s/basicinfo output:", req.params.fbapp);
+      console.log(output);
+      req.session.user = getReducedUser(JSON.parse(output), req.session.access_token);
+      console.log(JSON.stringify(req.session.user, undefined, 2));
 
-        getDeviceId(req.params.fbapp, req.session.user, function (item) {
-          if (item) {
-            console.log("Redirecting to entrance app");
-            res.redirect('http://entranceapp.herokuapp.com');
-        }
-          else { 
-            console.log("Redirecting to set up");
-            res.redirect('/' + req.params.fbapp + '/setupdevice');
-        }
-        });
+      getDeviceId(req.params.fbapp, req.session.user, function (item) {
+        if (item) {
+          console.log("Redirecting to entrance app");
+          res.redirect('http://entranceapp.herokuapp.com');
+      }
+        else { 
+          console.log("Redirecting to set up");
+          res.redirect('/' + req.params.fbapp + '/setupdevice');
+      }
       });
+    });
   });
 });
 
@@ -240,10 +232,25 @@ app.get('/:fbapp/logout', function (req, res) {
     return;
   }
   var fbLogoutUri = 'https://www.facebook.com/logout.php?next=http://' + app.get('host') + '/' + req.params.fbapp + '/login&access_token=' + req.session.access_token
-  req.session.user = null;
-  req.session.access_token = null;
-  req.session.fbapp = null;
+  req.session.destroy();
   res.redirect(fbLogoutUri);
+});
+
+/**
+ * API
+ */
+
+app.get('/:fbapp/user/:deviceid', function (req, res) {
+  console.log('retrieving id ' + req.params.deviceid + ' from app ' + req.params.fbapp);
+  getFbUser(req.params.fbapp, req.params.deviceid, function (item) {
+    if (item != null && item.fbuser != null) {
+      res.json(item.fbuser);
+    } else {
+      setFbUser(req.params.fbapp, req.params.deviceid, null, function () {
+        res.json({error:"Device ID not associated with Facebook user."});
+      })
+    }
+  });
 });
 
 
@@ -303,9 +310,11 @@ function getDeviceId(namespace, fbuser, callback) {
   });
 }
 
-function getUnclaimedDeviceIds(namespace, callback) {
+function getUnclaimedDeviceIds (namespace, callback) {
   db.collection(namespace, function (err, collection) {
-    collection.find({'fbuser': null}, function (err, cursor) {
+    collection.find({
+      'fbuser': null
+    }, function (err, cursor) {
       cursor.toArray(function (err, items) {
         callback(items);
       });
@@ -313,7 +322,7 @@ function getUnclaimedDeviceIds(namespace, callback) {
   });
 }
 
-function getAllFbUsers(namespace, callback) {
+function getAllFbUsers (namespace, callback) {
   db.collection(namespace, function (err, collection) {
     collection.find({}, function (err, cursor) {
       cursor.toArray(function (err, items) {
@@ -323,12 +332,29 @@ function getAllFbUsers(namespace, callback) {
   });
 }
 
-function getApiKey(namespace, callback) {
+function getApps (callback) {
+  db.collection('api_keys', function (err, collection) {
+    collection.find({}, function (err, cursor) {
+      cursor.toArray(function (err, items) {
+        callback(items.map(function (c) {
+          return {
+            namespace: c.namespace,
+            image: c.image,
+            description: c.description,
+            name: c.name
+          };
+        }));
+      });
+    });
+  });
+}
+
+function getApiKey (namespace, callback) {
   db.collection('api_keys', function (err, collection) {
     collection.findOne({
       'namespace': namespace,
     }, function (err, item) {
-        callback(item);
+      callback(item);
     });
   });
 }

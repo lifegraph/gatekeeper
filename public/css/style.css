@@ -38,13 +38,18 @@ body {
 }
 
 #apps .span4 {
-  border: 3px solid #122;
+  border: 4px solid #122;
   border-radius: 10px;
   background: white;
   padding: 0 0;
   overflow: hidden;
   box-shadow: rgba(0, 0, 0, 0.1) 4px 4px 2px;
   min-height: 360px;
+  -webkit-transition: border-color 0.1s linear;
+}
+
+#apps .span4:hover {
+  border-color: #8c0;
 }
 
 #apps .span4 div {
@@ -69,6 +74,7 @@ body {
 }
 
 #apps .controls {
+  margin-top: 4px;
   text-align: center;
   float: right; 
 }
