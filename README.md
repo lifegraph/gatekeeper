@@ -3,7 +3,7 @@ gate-keeper
 
 Server to sync the device IDs to Facebook users
 
-get it working for YOUr app
+get it working for your app
 ===========
 - Go set up a Facebook app developer.facebook.com/apps
 - Set your App Domains in Basic Info to be fb-gate-keeper.herokuapp.com

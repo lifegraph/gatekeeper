@@ -1,1 +1,1 @@
-web: node device_fbid_server.js
+web: node index.js

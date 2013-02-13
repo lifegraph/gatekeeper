@@ -1,5 +1,31 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  div.header
+    p 
+      b Lifegraph Connect
+      |  Securely link your physical identity with your Facebook identity.
+
+  div.container-fluid
+    #apps.row-fluid
+
+      .span4
+        a.cover(href='/entrance/login')
+          img(src='/img/entrance.jpg')
+        div
+          p.controls
+            a.btn.btn-primary(href='/entrance/login') Connect
+          h3 Entrance
+          p
+            | Use your ID to automatically play you and your friends favorite music with just a tap!
+
+
+      .span4
+        a.cover(href='/entrance/login')
+          img(src='http://www.googlestore.com/content/images/large/10-75006%202.jpg')
+        div
+          p.controls
+            a.btn.btn-primary(href='/entrance/login') Connect
+          h3 FaceDisc
+          p
+            | A frisbee disc which knows who is throwing it!

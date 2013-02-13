@@ -1,0 +1,74 @@
+body { 
+  margin: 0 0 30px;
+  padding: 0;
+  background: #37a;
+}
+
+.container-fluid {
+  padding: 0 30px;
+}
+
+.header {
+  border-radius: 0;
+  color: #fff;
+  background: none;
+  overflow: auto; 
+  margin: 30px 30px 30px;
+  padding: 10px 0;
+  border-bottom: 1px solid #268;
+}
+
+.header p {
+  font-size: 18px;
+  line-height: 20px;
+  font-weight: 100;
+  letter-spacing: 1px;
+}
+
+.header b {
+  font-size: 24px; 
+  margin-right: 20px;
+  letter-spacing: 0;
+}
+
+#apps .cover {
+  display: block;
+  max-height: 231px;
+  overflow: hidden; 
+}
+
+#apps .span4 {
+  border: 3px solid #122;
+  border-radius: 10px;
+  background: white;
+  padding: 0 0;
+  overflow: hidden;
+  box-shadow: rgba(0, 0, 0, 0.1) 4px 4px 2px;
+  min-height: 360px;
+}
+
+#apps .span4 div {
+  padding: 0 10px;
+}
+
+#apps .span4 p {
+  font-size: 12px;
+}
+
+#apps .span4 h3 {
+  color: black;
+  font-size: 30px;
+  z-index: 10;
+  text-shadow: #aaa 1px 1px 0;
+}
+
+#apps .span4 img {
+  z-index: 5;
+  width: 100%;
+  min-height: 200px;
+}
+
+#apps .controls {
+  text-align: center;
+  float: right; 
+}
