@@ -48,7 +48,11 @@ app.configure('production', function () {
 
 app.get('/', function (req, res) {
   getApps(function (apis) {
-    res.render('index', {title: 'Lifegraph Connect', apps: apis});
+    res.render('index', {
+      title: 'Lifegraph Connect',
+      apps: apis,
+      connected: false
+    });
   });
 });
 

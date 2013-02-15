@@ -31,50 +31,51 @@ body {
   letter-spacing: 0;
 }
 
-#apps .cover {
-  display: block;
-  max-height: 231px;
-  overflow: hidden; 
+#apps .app .cover {
+  position: absolute;
+  left: 0;
+  top: 0;
 }
 
-#apps .span4 {
-  border: 4px solid #122;
-  border-radius: 10px;
+#apps .app {
+  position: relative;
+  min-height: 200px;
   background: white;
-  padding: 0 0;
-  overflow: hidden;
-  box-shadow: rgba(0, 0, 0, 0.1) 4px 4px 2px;
-  min-height: 360px;
+  box-shadow: rgba(0, 0, 0, 0.3) 4px 4px 2px;
+  padding: 0 20px 50px 220px;
   -webkit-transition: border-color 0.1s linear;
 }
 
-#apps .span4:hover {
+#apps .app:hover {
   border-color: #8c0;
 }
 
-#apps .span4 div {
-  padding: 0 10px;
-}
-
-#apps .span4 p {
+#apps .app p {
   font-size: 12px;
 }
 
-#apps .span4 h3 {
+#apps .app h3 {
   color: black;
-  font-size: 30px;
+  font-size: 26px;
   z-index: 10;
   text-shadow: #aaa 1px 1px 0;
 }
 
-#apps .span4 img {
+#apps .app img {
   z-index: 5;
-  width: 100%;
+  width: 200px;
+  height: 200px;
   min-height: 200px;
 }
 
 #apps .controls {
-  margin-top: 4px;
-  text-align: center;
-  float: right; 
+  text-align: right;
+  position: absolute;
+  right: 20px;
+  bottom: 10px;
+}
+#apps .controls .dropdown {
+  margin: 0 5px; 
+  display: inline; 
+  text-align: left;
 }

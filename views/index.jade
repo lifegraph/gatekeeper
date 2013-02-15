@@ -10,22 +10,24 @@ block content
     #apps.row-fluid
 
       each app in apps
-        .span4
-          a.cover(href='/#{app.namespace}/login')
-            img(src='#{app.image}')
+        .span6.app
           div
-            p.controls
-              a.btn.btn-primary(href='/#{app.namespace}/login') Connect
-              .dropdown
-                a.dropdown-toggle.btn(data-toggle="dropdown", href="#")
-                  | Dropdown trigger
-                ul.dropdown-menu(role="menu", aria-labelledby="dLabel")
-                  li
-                    a
-                      | Play Music
-                  li
-                    a
-                      | Play Noise
+            a.cover(href='/#{app.namespace}/login')
+              img(src='#{app.image}')
             h3 #{app.name}
             p
               | #{app.description}
+            div.controls
+              if !connected
+                a.btn.btn-primary(href='/#{app.namespace}/login') Connect
+              else
+                .dropdown
+                  a.dropdown-toggle.btn.btn-info(data-toggle="dropdown", href="#")
+                    | Permissions
+                    b.caret
+                  ul.dropdown-menu(role="menu", aria-labelledby="dLabel")
+                    li
+                      a Play Music
+                    li
+                      a Play Noise
+                a.btn.btn-danger(href='/#{app.namespace}/logout') Log out
