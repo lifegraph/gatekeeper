@@ -44,6 +44,7 @@ body {
   box-shadow: rgba(0, 0, 0, 0.3) 4px 4px 2px;
   padding: 0 20px 50px 220px;
   -webkit-transition: border-color 0.1s linear;
+  margin-bottom: 20px;
 }
 
 #apps .app:hover {
@@ -78,4 +79,21 @@ body {
   margin: 0 5px; 
   display: inline; 
   text-align: left;
+}
+
+@media (max-width: 500px) {
+  #apps .app {
+    padding-left: 20px !important;
+  }
+
+  #apps .app .cover {
+    display: block;
+    position: static;
+    padding-top: 20px;
+  }
+
+  #apps .app img {
+    width: 100%;
+    height: auto;
+  }
 }
