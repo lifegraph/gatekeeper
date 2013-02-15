@@ -16,6 +16,16 @@ block content
           div
             p.controls
               a.btn.btn-primary(href='/#{app.namespace}/login') Connect
+              .dropdown
+                a.dropdown-toggle.btn(data-toggle="dropdown", href="#")
+                  | Dropdown trigger
+                ul.dropdown-menu(role="menu", aria-labelledby="dLabel")
+                  li
+                    a
+                      | Play Music
+                  li
+                    a
+                      | Play Noise
             h3 #{app.name}
             p
               | #{app.description}
