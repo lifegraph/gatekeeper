@@ -1,6 +1,6 @@
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
 socket.on('unmapped-pid', function (json) {
-  if (!$('[data-namespace=' + JSON.stringify(json.namespace)[0] + ']') || $('[data-namespace=' + JSON.stringify(json.namespace)).attr('data-connected') != 'false') {
+  if (!$('.app[data-namespace=' + json.namespace + ']')[0] || $('.app[data-namespace=' + json.namespace + ']').attr('data-connected') == undefined) {
     return;
   }
 
