@@ -389,7 +389,7 @@ app.get('/api/tokens/:pid', function (req, res) {
               res.json({error: 'No tokens found.'}, 404);
             } else {
               res.json({
-                id: binding.fbid
+                id: binding.fbid,
                 tokens: tokens.tokens
               });
             }
