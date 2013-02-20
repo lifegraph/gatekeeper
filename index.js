@@ -256,7 +256,7 @@ app.get('/:fbapp/admin', function (req, res) {
   getApiConfig(req.params.fbapp, function (err, apiconfig) {
     res.render('namespace', {
       namespace: req.params.fbapp,
-      apiconfig: apiconfig,
+      apiconfig: apiconfig || {},
       fbusers: []
     });
   });
@@ -352,50 +352,6 @@ app.get('/:fbapp/logout', function (req, res) {
     res.redirect('/');
   });
 });
-
-
-
-/*
-app.get('/:fbapp/setupdevice', function (req, res) {
-  if (!req.session.access_token) {
-    console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT setupdevice.")
-    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
-    return;
-  }
-  if (req.params.fbapp != req.session.fbapp) {
-    console.log("The session has an access token for app %s when the url requested is app %s.", req.session.fbapp, req.params.fbapp);
-    res.redirect('/' + req.params.fbapp + '/login');
-    return;
-  }
-  if (!req.session.user) {
-    console.log("NO " + req.params.fbapp + " USER AT setupdevice.")
-    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
-    return;
-  }
-  getUnclaimedDeviceIds(req.params.fbapp, function (deviceIds) {
-    console.log({namespace: req.params.fbapp, deviceIds: deviceIds});
-    res.render('setupdevice.jade', {namespace: req.params.fbapp, deviceIds: deviceIds});
-  });  
-});
-
-app.get('/:fbapp/sync/:deviceid', function (req, res) {
-  if (!req.session.access_token) {
-    console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT Basic info.")
-    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
-    return;
-  }
-  if (req.params.fbapp != req.session.fbapp) {
-    console.log("The session has an access token for app %s when the url requested is app %s.", req.session.fbapp, req.params.fbapp);
-    res.redirect('/' + req.params.fbapp + '/login');
-    return;
-  }
-  setFbUser(req.params.fbapp, req.params.deviceid, req.session.user, function () {
-    getApiConfig(req.params.fbapp, function (apikeyobj) {
-      res.redirect(apikeyobj.callback_url);
-    });
-  });
-});
-*/
 
 /**
  * API
