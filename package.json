@@ -11,7 +11,8 @@
     "mongodb": "latest",
     "rem": "~0.6.3",
     "async": "~0.2.5",
-    "mongojs": "~0.6.2"
+    "mongojs": "~0.6.2",
+    "socket.io": "~0.9.13"
   },
   "engines": {
     "node": "0.8.x",
