@@ -9,7 +9,7 @@ html
     script(src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js")
     script(src='/socket.io/socket.io.js')
     script
-      var socket = io.connect('http://localhost');
+      var socket = io.connect(window.location.protocol + '//' + window.location.host);
       socket.on('unmapped-pid', function (json) {
         $('#unclaimed-token').show();
         $('#unclaimed-token .namespace').text(json.namespace);
