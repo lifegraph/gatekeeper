@@ -263,7 +263,7 @@ app.get('/', function (req, res) {
 
 app.get('/:fbapp/admin', function (req, res) {
   getApiConfig(req.params.fbapp, function (err, apiconfig) {
-    res.render('namespace', {
+    res.render('admin', {
       namespace: req.params.fbapp,
       apiconfig: apiconfig || {},
       fbusers: []

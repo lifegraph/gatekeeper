@@ -1,5 +1,11 @@
 extends layout
 
+block head
+  title= title
+  script(src='/socket.io/socket.io.js')
+  script(src='/js/index.js')
+  link(rel='stylesheet', href='/css/style.css')
+
 block content
   div.header
     p 

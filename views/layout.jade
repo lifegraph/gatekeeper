@@ -1,55 +1,11 @@
 doctype 5
 html
   head
-    title= title
     meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1")
     link(href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/css/bootstrap-combined.min.css", rel="stylesheet")
-    link(rel='stylesheet', href='/css/style.css')
     script(src="//code.jquery.com/jquery.min.js")
     script(src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.0/js/bootstrap.min.js")
-    script(src='/socket.io/socket.io.js')
-    script
-      var socket = io.connect(window.location.protocol + '//' + window.location.host);
-      socket.on('unmapped-pid', function (json) {
-        $('#unclaimed-token').show();
-        $('#unclaimed-token .namespace').text(json.namespace);
-        $('#unclaimed-token .btn-info').unbind().on('click', function () {
-          $.ajax({
-            method: 'POST',
-            url: '/api/tokens/' + json.pid,
-            success: function () {
-              console.log(arguments);
-              console.log('success');
-              window.location.reload();
-            },
-            error: function () {
-              console.log(arguments);
-              console.log('error');
-            }
-          });
-        });
-      });
-
-      $(function () {
-        $('#unclaimed-token').hide();
-        $('#token-status .label-success').on('click', function () {
-          if (confirm('Would you like to unbind this ID?')) {
-            $.ajax({
-              method: 'DELETE',
-              url: '/api/tokens/' + $(this).attr('data-pid'),
-              success: function () {
-                console.log(arguments);
-                console.log('success');
-                window.location.reload();
-              },
-              error: function () {
-                console.log(arguments);
-                console.log('error');
-              }
-            });
-          }
-        })
-      });
+    block head
 
   body
     block content
