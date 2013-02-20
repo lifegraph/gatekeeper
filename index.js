@@ -21,6 +21,7 @@ var io = socketio.listen(server);
 var db;
 
 app.configure(function () {
+  console.log(process.env.MONGOLAB_URI)
   db = mongojs(process.env.MONGOLAB_URI || 'gate-keeper', [
     'api_keys',
     'auth_tokens',
@@ -151,7 +152,7 @@ function getApps (req, callback) {
         image: c.image,
         description: c.description,
         name: c.name,
-        app_permissions: c.app_permissions.split(/,\s*/),
+        app_permissions: c.app_permissions ? c.app_permissions.split(/,\s*/) : [],
         connected: false
       };
     }), function (item, next) {
