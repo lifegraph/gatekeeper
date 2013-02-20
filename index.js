@@ -17,7 +17,6 @@ var express = require('express')
 
 var app = express();
 var server = http.createServer(app);
-var io = socketio.listen(server);
 var db;
 
 app.configure(function () {
@@ -50,6 +49,16 @@ app.configure('development', function () {
 app.configure('production', function () {
   app.set('host', 'connect.lifegraphlabs.com')
 })
+
+/**
+ * Socket.io
+ */
+
+var io = socketio.listen(server);
+io.configure(function () { 
+  io.set("transports", ["xhr-polling"]); 
+  io.set("polling duration", 10); 
+});
 
 /**
  * Database operations
