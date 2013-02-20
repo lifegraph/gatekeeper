@@ -275,8 +275,8 @@ app.post('/:fbapp/admin', function (req, res) {
     'app_permissions': req.body.app_permissions
   }
   if (req.body.apikey && req.body.secretkey) {
-    props.api_key = apiKey;
-    props.secret_key = secretKey;
+    props.api_key = req.body.apikey;
+    props.secret_key = req.body.secretkey;
   }
   setApiConfig(req.params.fbapp, props, function () {
     res.redirect('/' + req.params.fbapp + '/admin');
