@@ -36,9 +36,9 @@ exports.index = function (req, res) {
       res.render('index', {
         title: 'Lifegraph Connect',
         apps: apis || [],
-        connected: true,
         device: helper.getSessionId(req) && device,
-        lifegraphConnected: lifegraphConnected
+        lifegraphConnected: lifegraphConnected,
+        fbid: helper.getSessionId(req)
       });
     });
   });
