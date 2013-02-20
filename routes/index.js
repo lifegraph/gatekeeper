@@ -22,16 +22,13 @@ exports.index = function (req, res) {
   database.getUserDevice(helper.getSessionId(req), function (err, device) {
     database.getApps(req, function (err, apis) {
       var lifegraphConnected = false;
-      apis.forEach(function(app) {
+      apis = apis.filter(function(app) {
         if (app.namespace == 'lifegraph') {
           lifegraphConnected = app.connected;
-          apis.splice(app);
+          return false;
         }
+        return true;
       });
-
-      if (lifegraphConnected) {
-        rem
-      }
 
       res.render('index', {
         title: 'Lifegraph Connect',
