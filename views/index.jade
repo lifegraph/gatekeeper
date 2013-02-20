@@ -11,6 +11,10 @@ block content
     p 
       b Lifegraph Connect
       |  Securely link your physical identity with your Facebook identity.
+      if (lifegraphConnected)
+        a.btn.btn-danger.right(href='/admin') Admin
+      else
+        a.btn.btn-primary.right(href="/lifegraph/login") Connect with Lifegraph
 
   div.container-fluid
     if device

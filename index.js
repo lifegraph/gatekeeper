@@ -60,9 +60,9 @@ app.get('/', index.index);
 
 // FB App endpoints
 // Administration control panel.
-app.get('/:fbapp/admin', fbapp.admin);
+app.get('/:fbapp/admin', fbapp.adminMiddleware, fbapp.admin);
 // Update device administration.
-app.post('/:fbapp/admin', fbapp.adminPost);
+app.post('/:fbapp/admin', fbapp.adminMiddleware, fbapp.adminPost);
 // First part of Facebook auth dance.
 app.get('/:fbapp/login', fbapp.login);
 // Response from Facebook with access token.

@@ -13,11 +13,59 @@ var rem = require('rem');
 var database = require('../controllers/database')
   , helper = require('../controllers/helper');
 
+
+/**
+ * Middleware for the admin pages of apps.
+ */
+
+exports.adminMiddleware = function (req, res, next) {
+  database.getApiConfig('lifegraph', function (err, lgconfig) {
+    database.getAuthTokens('lifegraph', helper.getSessionId(req), function (err, lgtokens) {
+      if (err || !lgtokens) {
+        console.log("REDIRECTING 1");
+        console.log(err);
+        console.log(lgtokens);
+        return res.redirect('/');
+      }
+
+      // Create Facebook client.
+      var fb = rem.connect('facebook.com', '*').configure({
+        key: lgconfig.api_key,
+        secret: lgconfig.secret_key
+      });
+
+      // Start oauth login.
+      var oauth = rem.oauth(fb, 'http://' + req.app.get('host') + '/' + req.params.fbapp + '/oauth/callback');
+      var user = oauth.restore(lgtokens.tokens);
+
+      user.validate(function (flag) {
+        if (!flag) {
+          console.log("REDIRECTING 2");
+          console.log(flag);
+          return res.redirect('/lifegraph/login');
+        }
+
+        console.log(lgtokens.tokens);
+
+        user('me/applications/developer/').get(function (err, json) {
+          // ...
+          // IF VALID THEN
+           if (json.data.some(function(app) { return app.namespace == req.params.fbapp})) {
+            next();
+          } else {
+            res.json({error: 'Not your app'}, 401);
+          }
+        });
+      })
+    });
+  });
+}
 /*
  * GET /:fbapp/admin
  *
  * Administration for each fb app.
  */
+
 
 exports.admin = function (req, res) {
   database.getApiConfig(req.params.fbapp, function (err, apiconfig) {
@@ -136,4 +184,3 @@ exports.logout = function (req, res) {
     res.redirect('/');
   });
 }
-
