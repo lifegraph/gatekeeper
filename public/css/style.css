@@ -18,6 +18,14 @@ body {
   border-bottom: 1px solid #268;
 }
 
+.right {
+  float:right;
+}
+
+.left {
+  float:left;
+}
+
 #token-status {
   margin-bottom: 30px;
   color: #fff;

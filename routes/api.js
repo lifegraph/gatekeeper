@@ -11,7 +11,6 @@
 var database = require('../controllers/database')
   , helper = require('../controllers/helper');
 
-
 var io;
 
 // call this once before server is started
@@ -24,6 +23,7 @@ exports.setServer = function(server) {
     io.set("polling duration", 10); 
   });
 }
+
 /*
  * GET /api/tokens/:pid
  *
