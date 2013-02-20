@@ -7,27 +7,46 @@ block content
       |  Securely link your physical identity with your Facebook identity.
 
   div.container-fluid
-    #apps.row-fluid
+    if device
+      p#token-status Connected tokens:
+        span.label.label-success(data-pid=device.pid)
+          | ##{device.pid}
+    else
+      p#token-status
+        | No physical tokens connected.
 
+    .alert.alert-info#unclaimed-token
+      button.close(type="button", data-dismiss="alert") &times;
+      | An unclaimed ID just connected to 
+      span.namespace
+      | .
+      button.btn.btn-info.btn-small(style="margin-left: 15px")
+        | Claim this ID
+      |  
+      button.btn.btn-small(type="button", data-dismiss="alert")
+        | Dismiss
+
+    #apps.row-fluid
       each app in apps
         .span6.app
           div
             a.cover(href='/#{app.namespace}/login')
               img(src='#{app.image}')
-            h3 #{app.name}
-            p
-              | #{app.description}
             div.controls
-              if !connected
-                a.btn.btn-primary(href='/#{app.namespace}/login') Connect
+              if !app.connected
+                a.btn.btn-primary.btn-small(href='/#{app.namespace}/login') Connect
               else
-                .dropdown
-                  a.dropdown-toggle.btn.btn-info(data-toggle="dropdown", href="#")
-                    | Permissions
-                    b.caret
-                  ul.dropdown-menu(role="menu", aria-labelledby="dLabel")
-                    li
-                      a Play Music
-                    li
-                      a Play Noise
-                a.btn.btn-danger(href='/#{app.namespace}/logout') Log out
+                if app.app_permissions
+                  .dropdown
+                    a.dropdown-toggle.btn.btn-info.btn-small(data-toggle="dropdown", href="#")
+                      | Permissions
+                      b.caret
+                    ul.dropdown-menu(role="menu", aria-labelledby="dLabel")
+                      for perm in app.app_permissions
+                        li
+                          a= perm
+                a.btn.btn-danger.btn-small(href='/#{app.namespace}/logout') Log out
+            .description
+              h3 #{app.name}
+              p
+                | #{app.description}

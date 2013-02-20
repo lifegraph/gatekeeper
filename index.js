@@ -4,22 +4,31 @@
 
 var express = require('express')
   , http = require('http')
-  , https = require('https')
-  , mongo = require('mongodb')
-  , Db = mongo.Db
+  , mongojs = require('mongojs')
   , path = require('path')
-  , fs = require('fs');
+  , fs = require('fs')
+  , rem = require('rem')
+  , async = require('async')
+  , socketio = require('socket.io');
+
+/**
+ * App configuration.
+ */
 
 var app = express();
-
-var db; // Database opened later
+var server = http.createServer(app);
+var io = socketio.listen(server);
+var db;
 
 app.configure(function () {
+  db = mongojs(process.env.MONGOLAB_URI || 'gate-keeper', [
+    'api_keys',
+    'auth_tokens',
+    'pids'
+  ]);
   app.set('port', process.env.PORT || 3000);
-  app.set('dburl', process.env.MONGOLAB_URI || 'mongodb://localhost:27017/gate-keeper');
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-
   app.use(express.favicon());
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
@@ -34,7 +43,6 @@ app.configure(function () {
 
 app.configure('development', function () {
   app.set('host', 'localhost:' + app.get('port'));
-
   app.use(express.errorHandler());
 });
 
@@ -43,248 +51,43 @@ app.configure('production', function () {
 })
 
 /**
- * Routes
- */
-
-app.get('/', function (req, res) {
-  getApps(function (apis) {
-    res.render('index', {
-      title: 'Lifegraph Connect',
-      apps: apis,
-      connected: false
-    });
-  });
-});
-
-// Administration control panel.
-
-app.get('/:fbapp/admin', function (req, res) {
-  getAllFbUsers(req.params.fbapp, function (dbitems) {
-    console.log("ADMIN:");
-    console.log(JSON.stringify(dbitems, undefined, 2));
-    console.log("USERs:");
-    var fbusers = dbitems.map(function (dbitem) { return dbitem.fbuser; }).filter(Boolean);
-    console.log(JSON.stringify(fbusers, undefined, 2));
-    res.render('namespace', {namespace:req.params.fbapp, fbusers: fbusers});
-  });
-});
-
-// Set the API keys.
-
-app.post('/:fbapp/keys', function (req, res) {
-  setApiKeys(req.params.fbapp, req.query.apikey, req.query.secretkey, req.query.perms, decodeURIComponent(req.query.callback), function () {
-    res.send('okay.');
-  });
-});
-
-// First part of Facebook auth dance.
-app.get('/:fbapp/login', function (req, res) {
-  getApiKey(req.params.fbapp, function (apikeyobj) {
-    if (!apikeyobj) {
-      return res.send('No app found.', 404);
-    }
-
-    var redirect_url = 'https://www.facebook.com/dialog/oauth?client_id=' + apikeyobj.api_key +
-     '&redirect_uri=http://' + app.get('host') + '/' + req.params.fbapp + '/perms' +
-     '&scope=' + apikeyobj.permissions + '&state=authed'
-    // console.log("REDIRECTIN' From /")
-    // console.log(redirect_url);
-    // console.log("REQUEST HEADERS:" + JSON.stringify(req.headers));
-    res.redirect(redirect_url);
-  });
-});
-
-// Response from Facebook with user permissions.
-app.get('/:fbapp/perms', function (req, res) {
-  getApiKey(req.params.fbapp, function (apikeyobj) {
-    var state = req.query['state'];
-    var code = req.query['code'];
-    // console.log("req.query:" + JSON.stringify(req.query))
-    // console.log("hit " + req.params.fbapp + "/perms")
-    // console.log("Code:");
-    // console.log(code);
-    if (state == 'authed') {
-      console.log('sick. Facebook PERMED us on ' + req.params.fbapp + '.')
-      var redirect_path = '/oauth/access_token?' +
-        'client_id=' + apikeyobj.api_key +
-        '&redirect_uri=http://' + app.get('host') + '/' + req.params.fbapp + '/perms' +
-        '&client_secret=' + apikeyobj.secret_key +
-        '&code=' + code;// + '&destination=chat';
-      var options = {
-        host: 'graph.facebook.com',
-        port: 443,
-        path: redirect_path
-      };
-
-      https.get(options, function (fbres) {
-        // console.log('STATUS: ' + fbres.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(fbres.headers));
-        var output = '';
-        fbres.on('data', function (chunk) {
-            output += chunk;
-        });
-
-        fbres.on('end', function () {
-          console.log("ACCESS TOKEN RIGHT HERE FOR " + req.params.fbapp);
-          console.log(output);
-          // parse the text to get the access token
-          req.session.access_token = output.replace(/access_token=/,"").replace(/&expires=\d+$/, "");
-          req.session.fbapp = req.params.fbapp;
-
-          // console.log("ACCESS TOKEN:" + access_token)
-          res.redirect('/' + req.params.fbapp + '/basicinfo');
-        });
-      }).on('error', function (e) {
-        console.log('ERROR: ' + e.message);
-        console.log(redirect_path);
-        console.log(JSON.stringify(e, undefined, 2))
-      });
-    } else {
-      console.error("WHAT THE HECK WE AREN'T AUTHED %s?????? %s", req.params.fbapp, state);
-    }
-  });
-});
-
-// Requests user info for the user, then redirects to the landing page.
-app.get('/:fbapp/basicinfo', function (req, res) {
-  if (!req.session.access_token) {
-    console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT Basic info.")
-    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
-    return;
-  }
-  if (req.params.fbapp != req.session.fbapp) {
-    console.log("The session has an access token for app %s when the url requested is app %s.", req.session.fbapp, req.params.fbapp);
-    res.redirect('/' + req.params.fbapp + '/login');
-    return;
-  }
-  var options = {
-      host: 'graph.facebook.com',
-      port: 443,
-      path: '/me?access_token=' + req.session.access_token
-    };
-  https.get(options, function (fbres) {
-    var output = '';
-    fbres.on('data', function (chunk) {
-        //console.log("CHUNK:" + chunk);
-        output += chunk;
-    });
-
-    fbres.on('end', function () {
-      console.log("%s/basicinfo output:", req.params.fbapp);
-      console.log(output);
-      req.session.user = getReducedUser(JSON.parse(output), req.session.access_token);
-      console.log(JSON.stringify(req.session.user, undefined, 2));
-
-      getDeviceId(req.params.fbapp, req.session.user, function (item) {
-        if (item) {
-          console.log("Redirecting to entrance app");
-          res.redirect('http://entranceapp.herokuapp.com');
-      }
-        else { 
-          console.log("Redirecting to set up");
-          res.redirect('/' + req.params.fbapp + '/setupdevice');
-      }
-      });
-    });
-  });
-});
-
-app.get('/:fbapp/setupdevice', function (req, res) {
-  if (!req.session.access_token) {
-    console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT setupdevice.")
-    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
-    return;
-  }
-  if (req.params.fbapp != req.session.fbapp) {
-    console.log("The session has an access token for app %s when the url requested is app %s.", req.session.fbapp, req.params.fbapp);
-    res.redirect('/' + req.params.fbapp + '/login');
-    return;
-  }
-  if (!req.session.user) {
-    console.log("NO " + req.params.fbapp + " USER AT setupdevice.")
-    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
-    return;
-  }
-  getUnclaimedDeviceIds(req.params.fbapp, function (deviceIds) {
-    console.log({namespace: req.params.fbapp, deviceIds: deviceIds});
-    res.render('setupdevice.jade', {namespace: req.params.fbapp, deviceIds: deviceIds});
-  });  
-});
-
-app.get('/:fbapp/sync/:deviceid', function (req, res) {
-  if (!req.session.access_token) {
-    console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT Basic info.")
-    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
-    return;
-  }
-  if (req.params.fbapp != req.session.fbapp) {
-    console.log("The session has an access token for app %s when the url requested is app %s.", req.session.fbapp, req.params.fbapp);
-    res.redirect('/' + req.params.fbapp + '/login');
-    return;
-  }
-  setFbUser(req.params.fbapp, req.params.deviceid, req.session.user, function () {
-    getApiKey(req.params.fbapp, function (apikeyobj) {
-      res.redirect(apikeyobj.callback_url);
-    });
-  });
-});
-
-// Allows the user to log out of our system.
-app.get('/:fbapp/logout', function (req, res) {
-  if (!req.session.access_token) {
-    res.redirect('/' + req.params.fbapp + '/login');
-    return;
-  }
-  var fbLogoutUri = 'https://www.facebook.com/logout.php?next=http://' + app.get('host') + '/' + req.params.fbapp + '/login&access_token=' + req.session.access_token
-  req.session.destroy();
-  res.redirect(fbLogoutUri);
-});
-
-/**
- * API
- */
-
-app.get('/:fbapp/user/:deviceid', function (req, res) {
-  console.log('retrieving id ' + req.params.deviceid + ' from app ' + req.params.fbapp);
-  getFbUser(req.params.fbapp, req.params.deviceid, function (item) {
-    if (item != null && item.fbuser != null) {
-      res.json(item.fbuser);
-    } else {
-      setFbUser(req.params.fbapp, req.params.deviceid, null, function () {
-        res.json({error:"Device ID not associated with Facebook user."});
-      })
-    }
-  });
-});
-
-
-/**
- * Database
- */
-
-// Start database and get things running
-console.log("connecting to database at " + app.get('dburl'));
-Db.connect(app.get('dburl'), {}, function (err, _db) {
-  // Escape our closure.
-  db = _db;
-
-  // Define some errors.
-  db.on("error", function (error) {
-    console.log("Error connecting to MongoLab.");
-    console.log(error);
-  });
-  console.log("Connected to mongo.");
-
-  // Start server.
-  http.createServer(app).listen(app.get('port'), function () {
-    console.log("Express server listening http://" + app.get('host'));
-  });
-});
-
-/**
  * Database operations
  */
 
+// device <-> fb user mappings.
+
+function getDeviceBinding (pid, next) {
+  db.pids.findOne({
+    "pid": pid
+  }, next);
+}
+
+function getUserDevice (fbid, next) {
+  db.pids.findOne({
+    "fbid": fbid
+  }, next);
+}
+
+function setDeviceBinding (pid, fbid, next) {
+  db.pids.update({
+    "pid": pid
+  }, {
+    "pid": pid,
+    "fbid": fbid
+  }, {
+    upsert: true,
+    safe: true
+  }, next); 
+}
+
+function removeDeviceBinding (pid, fbid, next) {
+  db.pids.remove({
+    "pid": pid,
+    "fbid": fbid
+  }, next);
+}
+
+/*
 function setFbUser (namespace, deviceid, fbuser, callback) {
   db.collection(namespace, function (err, collection) {
     collection.update({'deviceid': deviceid}, {
@@ -325,63 +128,338 @@ function getUnclaimedDeviceIds (namespace, callback) {
     });
   });
 }
+*/
 
+/*
 function getAllFbUsers (namespace, callback) {
   db.collection(namespace, function (err, collection) {
-    collection.find({}, function (err, cursor) {
-      cursor.toArray(function (err, items) {
+    collection.find({}, function (err, items) {
         callback(items);
       });
     });
   });
 }
+*/
 
-function getApps (callback) {
-  db.collection('api_keys', function (err, collection) {
-    collection.find({}, function (err, cursor) {
-      cursor.toArray(function (err, items) {
-        callback(items.map(function (c) {
-          return {
-            namespace: c.namespace,
-            image: c.image,
-            description: c.description,
-            name: c.name
-          };
-        }));
+// Apps
+
+function getApps (req, callback) {
+  db.api_keys.find({}, function (err, items) {
+    async.map((items || []).map(function (c) {
+      return {
+        namespace: c.namespace,
+        image: c.image,
+        description: c.description,
+        name: c.name,
+        app_permissions: c.app_permissions.split(/,\s*/),
+        connected: false
+      };
+    }), function (item, next) {
+      getAuthTokens(item.namespace, getSessionId(req), function (err, tokens) {
+        if (!err && tokens) {
+          item.connected = true;
+        }
+        next(null, item);
       });
+    }, function (err, items) {
+      callback(err, items);
     });
   });
 }
 
-function getApiKey (namespace, callback) {
-  db.collection('api_keys', function (err, collection) {
-    collection.findOne({
-      'namespace': namespace,
-    }, function (err, item) {
-      callback(item);
-    });
-  });
+// API keys.
+
+function getApiConfig (namespace, callback) {
+  db.api_keys.findOne({
+    'namespace': namespace,
+  }, callback);
 }
 
-function setApiKeys (namespace, apiKey, secretKey, permissions, callbackUrl, callback) {
-  console.log('setting api keys');
-  db.collection('api_keys', function (err, collection) {
-    collection.update({'namespace': namespace}, {
-      'namespace': namespace,
-      'api_key': apiKey,
-      'secret_key': secretKey,
-      'permissions': permissions,
-      'callback_url': callbackUrl
-    }, {safe: true, upsert: true}, callback);
-  });
+function setApiConfig (namespace, props, callback) {
+  db.api_keys.update({
+    'namespace': namespace
+  }, {
+    $set: props
+  }, {
+    safe: true,
+    upsert: true
+  }, callback);
+}
+
+// User auth tokens.
+
+function storeAuthTokens (namespace, fbid, tokens, next) {
+  db.auth_tokens.update({
+    namespace: namespace,
+    fbid: fbid
+  }, {
+    namespace: namespace,
+    fbid: fbid,
+    tokens: tokens
+  }, {
+    safe: true,
+    upsert: true
+  }, next);
+}
+
+function getAuthTokens (namespace, fbid, next) {
+  db.auth_tokens.findOne({
+    namespace: namespace,
+    fbid: fbid
+  }, next);
+}
+
+function deleteAuthTokens (namespace, fbid, next) {
+  db.auth_tokens.remove({
+    namespace: namespace,
+    fbid: fbid
+  }, next);
+}
+
+/** 
+ * Helpers
+ */
+
+function getSessionId (req) {
+  return req.session.fbid;
+}
+
+function setSessionId (req, id) {
+  req.session.fbid = id;
+}
+
+function removeSessionId (req) {
+  return delete req.session.fbid;
 }
 
 /**
- * Utilities
+ * Routes
  */
 
-// Returns a user object that only has the elements that we care about from the user
-// This solves the problem of cookies being too big to store
-function getReducedUser(user, access_token) {
-  return {id: user.id, name: user.name, first_name: user.first_name, last_name: user.last_name, link: user.link, username: user.username, access_token: access_token};
-}
+app.get('/', function (req, res) {
+  getUserDevice(getSessionId(req), function (err, device) {
+    getApps(req, function (err, apis) {
+      res.render('index', {
+        title: 'Lifegraph Connect',
+        apps: apis || [],
+        connected: true,
+        device: getSessionId(req) && device
+      });
+    });
+  });
+});
+
+// Administration control panel.
+
+app.get('/:fbapp/admin', function (req, res) {
+  getApiConfig(req.params.fbapp, function (err, apiconfig) {
+    res.render('namespace', {
+      namespace: req.params.fbapp,
+      apiconfig: apiconfig,
+      fbusers: []
+    });
+  });
+});
+
+// Update device administration.
+
+app.post('/:fbapp/admin', function (req, res) {
+  console.log(req.body);
+  var props = {
+    'permissions': req.body.scope,
+    'callback_url': req.body.callbackurl,
+    'name': req.body.name,
+    'description': req.body.description,
+    "image": req.body.image,
+    'app_permissions': req.body.app_permissions
+  }
+  if (req.body.apikey && req.body.secretkey) {
+    props.api_key = apiKey;
+    props.secret_key = secretKey;
+  }
+  setApiConfig(req.params.fbapp, props, function () {
+    res.redirect('/' + req.params.fbapp + '/admin');
+  });
+});
+
+// First part of Facebook auth dance.
+app.get('/:fbapp/login', function (req, res) {
+  getApiConfig(req.params.fbapp, function (err, config) {
+    if (!config) {
+      return res.send('No app found.', 404);
+    }
+
+    // Create Facebook client.
+    var fb = rem.connect('facebook.com', '*').configure({
+      key: config.api_key,
+      secret: config.secret_key
+    });
+
+    // Start oauth login.
+    var oauth = rem.oauth(fb, 'http://' + app.get('host') + '/' + req.params.fbapp + '/oauth/callback');
+    oauth.start({
+      scope: config.permissions
+    }, function (url) {
+      res.redirect(url);
+    });
+  });
+});
+
+// Response from Facebook with access token.
+
+app.get('/:fbapp/oauth/callback', function (req, res) {
+  getApiConfig(req.params.fbapp, function (err, keys) {
+    // Create Facebook client.
+    var fb = rem.connect('facebook.com', '*').configure({
+      key: keys.api_key,
+      secret: keys.secret_key
+    });
+
+    // Start and complete oauth.
+    var oauth = rem.oauth(fb, 'http://' + app.get('host') + '/' + req.params.fbapp + '/oauth/callback');
+    oauth.start({
+      scope: keys.permissions
+    }, function (url) {
+      oauth.complete(req.url, function (err, user) {
+        if (err) {
+          res.send('Invalid login credentials or invalid app configuration.');
+        } else {
+          // Get basic info.
+          user('me').get(function (err, json) {
+            if (err) {
+              res.send('Could not retrieve user information.');
+            } else {
+              user.saveState(function (state) {
+                storeAuthTokens(req.params.fbapp, json.id, state, function () {
+                  setSessionId(req, json.id);
+                  res.redirect('/');
+                });
+              })
+            }
+          })
+        }
+      });
+    });
+  });
+});
+
+// Allows the user to log out of an application.
+
+app.get('/:fbapp/logout', function (req, res) {
+  deleteAuthTokens(req.params.fbapp, getSessionId(req), function () {
+    removeSessionId(req);
+    res.redirect('/');
+  });
+});
+
+
+
+/*
+app.get('/:fbapp/setupdevice', function (req, res) {
+  if (!req.session.access_token) {
+    console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT setupdevice.")
+    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
+    return;
+  }
+  if (req.params.fbapp != req.session.fbapp) {
+    console.log("The session has an access token for app %s when the url requested is app %s.", req.session.fbapp, req.params.fbapp);
+    res.redirect('/' + req.params.fbapp + '/login');
+    return;
+  }
+  if (!req.session.user) {
+    console.log("NO " + req.params.fbapp + " USER AT setupdevice.")
+    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
+    return;
+  }
+  getUnclaimedDeviceIds(req.params.fbapp, function (deviceIds) {
+    console.log({namespace: req.params.fbapp, deviceIds: deviceIds});
+    res.render('setupdevice.jade', {namespace: req.params.fbapp, deviceIds: deviceIds});
+  });  
+});
+
+app.get('/:fbapp/sync/:deviceid', function (req, res) {
+  if (!req.session.access_token) {
+    console.log("NO " + req.params.fbapp + " ACCESS TOKEN AT Basic info.")
+    res.redirect('/' + req.params.fbapp + '/login'); // go home to start the auth process again
+    return;
+  }
+  if (req.params.fbapp != req.session.fbapp) {
+    console.log("The session has an access token for app %s when the url requested is app %s.", req.session.fbapp, req.params.fbapp);
+    res.redirect('/' + req.params.fbapp + '/login');
+    return;
+  }
+  setFbUser(req.params.fbapp, req.params.deviceid, req.session.user, function () {
+    getApiConfig(req.params.fbapp, function (apikeyobj) {
+      res.redirect(apikeyobj.callback_url);
+    });
+  });
+});
+*/
+
+/**
+ * API
+ */
+
+// Recover tokens for a physical ID. Expect namespace, appid, and secret in the request query.
+
+app.get('/api/tokens/:pid', function (req, res) {
+  // Validate authorization.
+  getApiConfig(req.query.namespace, function (err, config) {
+    if (err || !config || config.api_key != req.query.key || config.secret_key != req.query.secret) {
+      // Return 404 to not expose implementation details.
+      res.json({error: 'Invalid credentials.'}, 401);
+    } else {
+      getDeviceBinding(req.params.pid, function (err, binding) {
+        if (err || !binding) {
+          res.json({error: 'Could not find physical ID.'}, 404);
+          io.sockets.emit('unmapped-pid', {
+            pid: req.params.pid,
+            namespace: req.query.namespace
+          });
+
+        } else {
+          getAuthTokens(req.query.namespace, binding.fbid, function (err, tokens) {
+            if (err || !tokens) {
+              res.json({error: 'No tokens found.'}, 404);
+            } else {
+              res.json({tokens: tokens.tokens});
+            }
+          })
+        }
+      })
+    }
+  });
+});
+
+app.post('/api/tokens/:pid', function (req, res) {
+  console.log('get binding');
+  getDeviceBinding(req.params.pid, function (err, binding) {
+    if (err || !binding) {
+      setDeviceBinding(req.params.pid, getSessionId(req), function (err) {
+        console.log('Device', req.params.pid, 'bound to', req.query.namespace, 'user', getSessionId(req));
+        res.json({error: false, message: 'Cool digs man.'}, 201);
+      });
+    } else {
+      res.json({error: true, message: 'Device already associated with this account. Please unbind first.'}, 401);
+    }
+  });
+});
+
+app.del('/api/tokens/:pid', function (req, res) {
+  console.log('delete binding');
+  removeDeviceBinding(req.params.pid, getSessionId(req), function (err, flag) {
+    if (flag) {
+      res.json({error: false, message: 'Tokens deleted.'}, 201);
+    } else {
+      res.json({error: true, message: 'Token not deleted.'}, 401);
+    }
+  });
+})
+
+/**
+ * Launch.
+ */
+ 
+server.listen(app.get('port'), function () {
+  console.log("Express server listening http://" + app.get('host'));
+});

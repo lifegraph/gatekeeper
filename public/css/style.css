@@ -13,9 +13,27 @@ body {
   color: #fff;
   background: none;
   overflow: auto; 
-  margin: 30px 30px 30px;
+  margin: 30px 30px 15px;
   padding: 10px 0;
   border-bottom: 1px solid #268;
+}
+
+#token-status {
+  margin-bottom: 30px;
+  color: #fff;
+  font-size: 12px;
+}
+
+#token-status span {
+  margin-left: 10px;
+}
+
+#token-status .label-success {
+  cursor: pointer;
+}
+
+#unclaimed-token {
+  margin-top: -15px;
 }
 
 .header p {
@@ -42,7 +60,7 @@ body {
   min-height: 200px;
   background: white;
   box-shadow: rgba(0, 0, 0, 0.3) 4px 4px 2px;
-  padding: 0 20px 50px 220px;
+  padding: 0 0 50px 200px;
   -webkit-transition: border-color 0.1s linear;
   margin-bottom: 20px;
 }
@@ -57,9 +75,10 @@ body {
 
 #apps .app h3 {
   color: black;
-  font-size: 26px;
+  font-size: 20px;
+  line-height: 25px;
   z-index: 10;
-  text-shadow: #aaa 1px 1px 0;
+  text-shadow: #ccc 1px 1px 0;
 }
 
 #apps .app img {
@@ -71,9 +90,9 @@ body {
 
 #apps .controls {
   text-align: right;
-  position: absolute;
-  right: 20px;
-  bottom: 10px;
+  background: #ddd;
+  padding: 5px 5px;
+  border-bottom: #aaa 1px solid;
 }
 #apps .controls .dropdown {
   margin: 0 5px; 
@@ -81,9 +100,13 @@ body {
   text-align: left;
 }
 
+#apps .description {
+  padding: 0px 10px 5px;
+}
+
 @media (max-width: 500px) {
   #apps .app {
-    padding-left: 20px !important;
+    padding-left: 0 !important;
   }
 
   #apps .app .cover {
@@ -96,4 +119,8 @@ body {
     width: 100%;
     height: auto;
   }
+}
+
+#token-status.label-warning {
+  cursor: pointer;
 }

@@ -8,9 +8,12 @@
   "dependencies": {
     "express": "3.1.0",
     "jade": "*",
-    "mongodb":"latest"
+    "mongodb": "latest",
+    "rem": "~0.6.3",
+    "async": "~0.2.5",
+    "mongojs": "~0.6.2"
   },
-    "engines": {
+  "engines": {
     "node": "0.8.x",
     "npm": "1.1.x"
   }
