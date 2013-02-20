@@ -4,7 +4,8 @@
 
 
 var mongojs = require('mongojs')
-  , async = require('async');
+  , async = require('async')
+  , helper = require('./helper');
 
 // device <-> fb user mappings.
 
@@ -60,7 +61,7 @@ exports.getApps = function (req, callback) {
         connected: false
       };
     }), function (item, next) {
-      getAuthTokens(item.namespace, getSessionId(req), function (err, tokens) {
+      getAuthTokens(item.namespace, helper.getSessionId(req), function (err, tokens) {
         if (!err && tokens) {
           item.connected = true;
         }
