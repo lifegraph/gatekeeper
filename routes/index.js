@@ -16,10 +16,14 @@ var database = require('../controllers/database')
 exports.index = function (req, res) {
   database.getUserDevice(helper.getSessionId(req), function (err, device) {
     database.getApps(req, function (err, apis) {
-      var lifegraphConnected = apis.some(function(app) { return app.namespace == 'lifegraph'});
-
-      console.log("HEY");
-      console.log(apis);
+      var lifegraphConnected = false;
+      apis = apis.filter(function(app) {
+        if (app.namespace == 'lifegraph') {
+          lifegraphConnected = app.connected;
+          return false;
+        }
+        return true;
+      });
       res.render('index', {
         title: 'Lifegraph Connect',
         apps: apis || [],

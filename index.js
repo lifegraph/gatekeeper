@@ -12,7 +12,7 @@ var express = require('express')
 
 var index = require('./routes/index')
   , fbapp = require('./routes/fbapp')
-  , apiTokens = require('./routes/apiTokens');
+  , api = require('./routes/api');
 
 /**
  * App configuration.
@@ -25,7 +25,7 @@ var server = http.createServer(app);
  * Local dependency initialization
  */
 
-apiTokens.setServer(server); // let the apiTokens know our server 
+api.setServer(server); // let the api know our server 
 
 app.configure(function () {
   app.set('port', process.env.PORT || 3000);
@@ -72,9 +72,9 @@ app.get('/:fbapp/logout', fbapp.logout);
 
 // API
 // Physical IDs
-app.get('/api/tokens/:pid', apiTokens.pid);
-app.post('/api/tokens/:pid', apiTokens.pidPost);
-app.del('/api/tokens/:pid', apiTokens.pidDel);
+app.get('/api/tokens/:pid', api.pid);
+app.post('/api/tokens/:pid', api.pidPost);
+app.del('/api/tokens/:pid', api.pidDel);
 
 /**
  * Launch.
