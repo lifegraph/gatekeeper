@@ -3,19 +3,24 @@ socket.on('unmapped-pid', function (json) {
   $('#unclaimed-token').show();
   $('#unclaimed-token .namespace').text(json.namespace);
   $('#unclaimed-token .btn-info').unbind().on('click', function () {
-    $.ajax({
-      method: 'POST',
-      url: '/api/tokens/' + json.pid,
-      success: function () {
-        console.log(arguments);
-        console.log('success');
-        window.location.reload();
-      },
-      error: function () {
-        console.log(arguments);
-        console.log('error');
-      }
-    });
+
+    if (!json.pid) {
+      window.location = '/' + json.namespace + '/login';
+    } else {
+        $.ajax({
+        method: 'POST',
+        url: '/api/tokens/' + json.pid,
+        success: function () {
+          console.log(arguments);
+          console.log('success');
+          window.location.reload();
+        },
+        error: function () {
+          console.log(arguments);
+          console.log('error');
+        }
+      });
+    }
   });
 });
 
