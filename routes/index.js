@@ -3,11 +3,6 @@
  */
 
 /**
- * Module dependencies
- */
-var rem = require('rem');
-
-/**
  * Local dependencies
  */
 
@@ -21,18 +16,10 @@ var database = require('../controllers/database')
 exports.index = function (req, res) {
   database.getUserDevice(helper.getSessionId(req), function (err, device) {
     database.getApps(req, function (err, apis) {
-      var lifegraphConnected = false;
-      apis.forEach(function(app) {
-        if (app.namespace == 'lifegraph') {
-          lifegraphConnected = app.connected;
-          apis.splice(app);
-        }
-      });
+      var lifegraphConnected = apis.some(function(app) { return app.namespace == 'lifegraph'});
 
-      if (lifegraphConnected) {
-        rem
-      }
-
+      console.log("HEY");
+      console.log(apis);
       res.render('index', {
         title: 'Lifegraph Connect',
         apps: apis || [],
