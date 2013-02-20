@@ -73,7 +73,7 @@ exports.login = function (req, res) {
     });
 
     // Start oauth login.
-    var oauth = rem.oauth(fb, 'http://' + app.get('host') + '/' + req.params.fbapp + '/oauth/callback');
+    var oauth = rem.oauth(fb, 'http://' + req.app.get('host') + '/' + req.params.fbapp + '/oauth/callback');
     oauth.start({
       scope: config.permissions
     }, function (url) {
@@ -97,7 +97,7 @@ exports.callback = function (req, res) {
     });
 
     // Start and complete oauth.
-    var oauth = rem.oauth(fb, 'http://' + app.get('host') + '/' + req.params.fbapp + '/oauth/callback');
+    var oauth = rem.oauth(fb, 'http://' + req.app.get('host') + '/' + req.params.fbapp + '/oauth/callback');
     oauth.start({
       scope: keys.permissions
     }, function (url) {
