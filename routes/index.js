@@ -19,8 +19,8 @@ exports.index = function (req, res) {
       res.render('index', {
         title: 'Lifegraph Connect',
         apps: apis || [],
-        connected: true,
-        device: helper.getSessionId(req) && device
+        device: helper.getSessionId(req) && device,
+        fbid: helper.getSessionId(req)
       });
     });
   });

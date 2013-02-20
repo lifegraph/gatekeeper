@@ -34,7 +34,7 @@ block content
 
     #apps.row-fluid
       each app in apps
-        .span6.app
+        .span6.app(data-connected=app.connected, data-namespace=app.namespace)
           div
             a.cover(href='/#{app.namespace}/login')
               img(src='#{app.image}')
