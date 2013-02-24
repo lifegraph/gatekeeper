@@ -1,5 +1,29 @@
 extends layout
 
+mixin app(app)
+  .span6.app(data-connected=app.connected, data-namespace=app.namespace)
+    div
+      a.cover(href='/#{app.namespace}/login')
+        img(src='#{app.image}')
+      div.controls
+        if !app.connected
+          a.btn.btn-primary.btn-small(href='/#{app.namespace}/login') Connect
+        else
+          if app.app_permissions
+            .dropdown
+              a.dropdown-toggle.btn.btn-info.btn-small(data-toggle="dropdown", href="#")
+                | Permissions
+                b.caret
+              ul.dropdown-menu(role="menu", aria-labelledby="dLabel")
+                for perm in app.app_permissions
+                  li
+                    a= perm
+          a.btn.btn-danger.btn-small(href='/#{app.namespace}/logout') Log out
+      .description
+        h3 #{app.name}
+        p
+          | #{app.description}
+
 block head
   title= title
   script(src='/socket.io/socket.io.js')
@@ -36,27 +60,12 @@ block content
       button.btn.btn-small(type="button", data-dismiss="alert")
         | Dismiss
 
-    #apps.row-fluid
-      each app in apps
-        .span6.app(data-connected=app.connected, data-namespace=app.namespace)
-          div
-            a.cover(href='/#{app.namespace}/login')
-              img(src='#{app.image}')
-            div.controls
-              if !app.connected
-                a.btn.btn-primary.btn-small(href='/#{app.namespace}/login') Connect
-              else
-                if app.app_permissions
-                  .dropdown
-                    a.dropdown-toggle.btn.btn-info.btn-small(data-toggle="dropdown", href="#")
-                      | Permissions
-                      b.caret
-                    ul.dropdown-menu(role="menu", aria-labelledby="dLabel")
-                      for perm in app.app_permissions
-                        li
-                          a= perm
-                a.btn.btn-danger.btn-small(href='/#{app.namespace}/logout') Log out
-            .description
-              h3 #{app.name}
-              p
-                | #{app.description}
+    #apps
+      each app, i in apps
+        // using the app mixin
+        if i % 2 == 0
+          .row-fluid
+            +app(app) 
+            if (i + 1 < apps.length)
+              +app(apps[i+1])
+            
