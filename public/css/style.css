@@ -57,6 +57,14 @@ body {
   letter-spacing: 0;
 }
 
+.header a {
+  font-size: 18px;
+  line-height: 20px;
+  font-weight: 100;
+  letter-spacing: 1px;
+  color: white;
+}
+
 #apps .app .cover {
   position: absolute;
   left: 0;

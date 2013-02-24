@@ -6,10 +6,10 @@ block head
 
 block content
   .container-fluid
-    h2 Facebook Apps you can configure.
-    | See your apps on Facebook at 
-      a(href="https://developers.facebook.com/apps") developers.facebook.com/apps
+    h2 Facebook Apps you can add to Lifegraph Connect
     ul#fbapps
       each app in apps
         li 
-          a(href="http://connect.lifegraph.com/#{app.namespace}/admin") #{app.name}
+          a(href="/#{app.namespace}/admin") #{app.name}
+    div See these apps on your 
+      a(href="https://developers.facebook.com/apps") Facebook Developers Apps page

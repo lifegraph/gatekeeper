@@ -19,13 +19,21 @@ var database = require('../controllers/database')
  */
 
 exports.adminMiddleware = function (req, res, next) {
-  database.getApiConfig('lifegraph', function (err, lgconfig) {
-    database.getAuthTokens('lifegraph', helper.getSessionId(req), function (err, lgtokens) {
+  database.getApiConfig(req.app.get('fbapp'), function (err, lgconfig) {
+    database.getAuthTokens(req.app.get('fbapp'), helper.getSessionId(req), function (err, lgtokens) {
       if (err || !lgtokens) {
         console.log("REDIRECTING 1");
         console.log(err);
         console.log(lgtokens);
-        return res.redirect('/');
+        // OH SHIIII
+        // we don't have the needed production (lifegraph) or development (lifegraph-local) app set up
+        // which means we would go into a spin of awful infinite redirects back to the homepage
+        // F it, just let them edit it in that case if they are trying to get to the app that runs this site
+        if (req.params.fbapp == req.app.get('fbapp')) {
+          return next();
+        } else {
+          return res.redirect('/');
+        }
       }
 
       // Create Facebook client.
@@ -42,7 +50,7 @@ exports.adminMiddleware = function (req, res, next) {
         if (!flag) {
           console.log("REDIRECTING 2");
           console.log(flag);
-          return res.redirect('/lifegraph/login');
+          return res.redirect('/' + req.app.get('fbapp') + '/login');
         }
 
         console.log(lgtokens.tokens);
@@ -54,7 +62,7 @@ exports.adminMiddleware = function (req, res, next) {
             res.json({error: 'Not your app'}, 401);
           }
         });
-      })
+      });
     });
   });
 }

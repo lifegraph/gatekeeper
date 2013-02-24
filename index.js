@@ -46,10 +46,12 @@ app.configure(function () {
 
 app.configure('development', function () {
   app.set('host', 'localhost:' + app.get('port'));
+  app.set('fbapp', 'lifegraph-local');
   app.use(express.errorHandler());
 });
 
 app.configure('production', function () {
+  app.set('fbapp', 'lifegraph');
   app.set('host', 'connect.lifegraphlabs.com')
 })
 
@@ -57,9 +59,9 @@ app.configure('production', function () {
  * Routes
  */
 
-app.get('/', index.index);
+app.get('/', index.lifeGraphSetUpMiddleWare, index.index);
 
-// Admin ednpoints
+// Admin endpoints
 app.get('/admin', admin.adminlist);
 
 // FB App endpoints

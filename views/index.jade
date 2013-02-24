@@ -12,9 +12,9 @@ block content
       b Lifegraph Connect
       |  Securely link your physical identity with your Facebook identity.
       if (lifegraphConnected)
-        a.btn.btn-danger.right(href='/admin') Admin
+        a.right(href='/admin') See your apps
       else
-        a.btn.btn-primary.right(href="/lifegraph/login") Connect with Lifegraph
+        a.right(href="/#{lifegraphNamespace}/login") Login to admin your apps
 
   div.container-fluid
     if device
