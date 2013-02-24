@@ -9,7 +9,7 @@ var mongojs = require('mongojs')
 
 // device <-> fb user mappings.
 
-console.log(process.env.MONGOLAB_URI)
+console.log(process.env.MONGOLAB_URI);
 var db = mongojs(process.env.MONGOLAB_URI || 'gate-keeper', [
   'api_keys',
   'auth_tokens',
