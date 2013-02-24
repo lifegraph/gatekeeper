@@ -35,7 +35,10 @@ block content
           | Secret Key: 
           input(type='text', name='secretkey')
       div#button-div
-        button(type='submit', class='btn btn-primary') Update
+        span
+          a.btn.btn-warning.btn-small(href='/', style="margin-right:20px") Home
+        span
+          button(type='submit', class='btn btn-primary') Update
     ul#fbusers
       each fbuser in fbusers
         li 
