@@ -48,8 +48,6 @@ exports.adminMiddleware = function (req, res, next) {
         console.log(lgtokens.tokens);
 
         user('me/applications/developer/').get(function (err, json) {
-          // ...
-          // IF VALID THEN
            if (json.data.some(function(app) { return app.namespace == req.params.fbapp})) {
             next();
           } else {

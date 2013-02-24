@@ -1,0 +1,15 @@
+extends layout
+
+block head
+  title Lifegraph Connect Admin page
+  link(rel='stylesheet', href='//netdna.bootstrapcdn.com/bootswatch/2.1.1/readable/bootstrap.min.css')
+
+block content
+  .container-fluid
+    h2 Facebook Apps you can configure.
+    | See your apps on Facebook at 
+      a(href="https://developers.facebook.com/apps") developers.facebook.com/apps
+    ul#fbapps
+      each app in apps
+        li 
+          a(href="http://connect.lifegraph.com/#{app.namespace}/admin") #{app.name}

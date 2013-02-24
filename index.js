@@ -12,6 +12,7 @@ var express = require('express')
 
 var index = require('./routes/index')
   , fbapp = require('./routes/fbapp')
+  , admin = require('./routes/admin')
   , api = require('./routes/api');
 
 /**
@@ -57,6 +58,9 @@ app.configure('production', function () {
  */
 
 app.get('/', index.index);
+
+// Admin ednpoints
+app.get('/admin', admin.adminlist);
 
 // FB App endpoints
 // Administration control panel.
