@@ -57,7 +57,6 @@ exports.getApps = function (req, callback) {
         image: c.image,
         description: c.description,
         name: c.name,
-        app_permissions: c.app_permissions ? c.app_permissions.split(/,\s*/) : [],
         connected: false
       };
     }), function (item, next) {

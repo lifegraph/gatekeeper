@@ -96,8 +96,7 @@ exports.adminPost = function (req, res) {
     'callback_url': req.body.callbackurl,
     'name': req.body.name,
     'description': req.body.description,
-    "image": req.body.image,
-    'app_permissions': req.body.app_permissions
+    "image": req.body.image
   }
   if (req.body.apikey && req.body.secretkey) {
     props.api_key = req.body.apikey;
