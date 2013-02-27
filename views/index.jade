@@ -9,7 +9,7 @@ mixin app(app)
         if !app.connected
           a.btn.btn-primary.btn-small(href='/#{app.namespace}/login') Connect
         else
-          if app.app_permissions
+          if app.app_permissions.length
             .dropdown
               a.dropdown-toggle.btn.btn-info.btn-small(data-toggle="dropdown", href="#")
                 | Permissions
