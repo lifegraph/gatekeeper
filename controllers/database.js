@@ -22,8 +22,8 @@ exports.getDeviceBinding = function (pid, next) {
   }, next);
 }
 
-exports.getUserDevice = function (fbid, next) {
-  db.pids.findOne({
+exports.getUserDevices = function (fbid, next) {
+  db.pids.find({
     "fbid": fbid
   }, next);
 }

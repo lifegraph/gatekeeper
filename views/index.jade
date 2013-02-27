@@ -32,10 +32,11 @@ block content
         a.right(href="/#{lifegraphNamespace}/login") Login to admin your apps
 
   div.container-fluid
-    if device
+    if devices.length
       p#token-status Connected tokens:
-        span.label.label-success(data-pid=device.pid)
-          | ##{device.pid}
+        each device in devices
+          span.label.label-success(data-pid=device.pid)
+            | ##{device.pid}
     else
       p#token-status
         | No physical tokens connected.
