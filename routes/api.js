@@ -34,7 +34,7 @@ exports.pid = function (req, res) {
   // Validate authorization.
   database.getApiConfig(req.query.namespace, function (err, config) {
     if (err || !config || config.api_key != req.query.key || config.secret_key != req.query.secret) {
-      // Return 404 to not expose implementation details.
+      // Return 401 to not expose implementation details.
       res.json({error: 'Invalid credentials.'}, 401);
     } else {
       database.getDeviceBinding(req.params.pid, function (err, binding) {

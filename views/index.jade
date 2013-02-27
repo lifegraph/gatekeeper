@@ -40,16 +40,7 @@ block content
       p#token-status
         | No physical tokens connected.
 
-    .alert.alert-info#unclaimed-token
-      button.close(type="button", data-dismiss="alert") &times;
-      | An unclaimed ID just connected to 
-      span.namespace
-      | .
-      button.btn.btn-info.btn-small(style="margin-left: 15px")
-        | Claim this ID
-      |  
-      button.btn.btn-small(type="button", data-dismiss="alert")
-        | Dismiss
+    #unclaimed-tokens
 
     #apps
       each app, i in apps
