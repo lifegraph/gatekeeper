@@ -1,9 +1,9 @@
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
 socket.on('unmapped-pid', function (json) {
   console.log("YEAH")
-  // if (!$('.app[data-namespace=' + json.namespace + ']')[0] || $('.app[data-namespace=' + json.namespace + ']').attr('data-connected') == undefined) {
-  //   return;
-  // }
+  if (!$('.app[data-namespace=' + json.namespace + ']')[0] || $('.app[data-namespace=' + json.namespace + ']').attr('data-connected') == undefined) {
+    return;
+  }
   var $unclaimed_token = $('<div></div>');
   $unclaimed_token.addClass('alert').addClass('alert-info').addClass('unclaimed-token');
   $unclaimed_token.append($('<button/>').addClass('close').attr('type', 'button').attr('data-dismiss', 'alert').html('&times;'));

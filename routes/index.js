@@ -45,7 +45,7 @@ exports.index = function (req, res) {
       res.render('index', {
         title: 'Lifegraph Connect',
         apps: apis || [],
-        devices: helper.getSessionId(req) && devices,
+        devices: (helper.getSessionId(req) && devices) || [],
         lifegraphConnected: lifegraphConnected,
         lifegraphNamespace: req.app.get('fbapp'),
         fbid: helper.getSessionId(req)
