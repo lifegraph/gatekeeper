@@ -34,11 +34,13 @@ exports.pid = function (req, res) {
   // Validate authorization.
   database.getApiConfig(req.query.namespace, function (err, config) {
     if (err || !config || config.api_key != req.query.key || config.secret_key != req.query.secret) {
-      // Return 404 to not expose implementation details.
+      // Return 401 to not expose implementation details.
+      // console.log(config, req.query);
       res.json({error: 'Invalid credentials.'}, 401);
     } else {
       database.getDeviceBinding(req.params.pid, function (err, binding) {
         if (err || !binding) {
+          console.log("Fresh token: ", req.params.pid);
           res.json({error: 'Could not find physical ID.'}, 404);
           io.sockets.emit('unmapped-pid', {
             pid: req.params.pid,
@@ -49,6 +51,7 @@ exports.pid = function (req, res) {
           database.getAuthTokens(req.query.namespace, binding.fbid, function (err, tokens) {
             if (err || !tokens) {
               res.json({error: 'No tokens found.'}, 406);
+              console.log("No tokens found for pid: ", req.params.pid);
             } else {
               res.json({
                 id: binding.fbid,

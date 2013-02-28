@@ -32,7 +32,7 @@ exports.lifeGraphSetUpMiddleWare = function (req, res, next) {
  */
  
 exports.index = function (req, res) {
-  database.getUserDevice(helper.getSessionId(req), function (err, device) {
+  database.getUserDevices(helper.getSessionId(req), function (err, devices) {
     database.getApps(req, function (err, apis) {
       var lifegraphConnected = false;
       apis = apis.filter(function(app) {
@@ -45,7 +45,7 @@ exports.index = function (req, res) {
       res.render('index', {
         title: 'Lifegraph Connect',
         apps: apis || [],
-        device: helper.getSessionId(req) && device,
+        devices: (helper.getSessionId(req) && devices) || [],
         lifegraphConnected: lifegraphConnected,
         lifegraphNamespace: req.app.get('fbapp'),
         fbid: helper.getSessionId(req)

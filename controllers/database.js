@@ -9,7 +9,7 @@ var mongojs = require('mongojs')
 
 // device <-> fb user mappings.
 
-console.log(process.env.MONGOLAB_URI)
+console.log(process.env.MONGOLAB_URI);
 var db = mongojs(process.env.MONGOLAB_URI || 'gate-keeper', [
   'api_keys',
   'auth_tokens',
@@ -22,8 +22,8 @@ exports.getDeviceBinding = function (pid, next) {
   }, next);
 }
 
-exports.getUserDevice = function (fbid, next) {
-  db.pids.findOne({
+exports.getUserDevices = function (fbid, next) {
+  db.pids.find({
     "fbid": fbid
   }, next);
 }
@@ -57,7 +57,6 @@ exports.getApps = function (req, callback) {
         image: c.image,
         description: c.description,
         name: c.name,
-        app_permissions: c.app_permissions ? c.app_permissions.split(/,\s*/) : [],
         connected: false
       };
     }), function (item, next) {
