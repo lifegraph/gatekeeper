@@ -7,7 +7,7 @@ mixin app(app)
         img(src='#{app.image}')
       div.controls
         if lifegraphConnected
-          if app.connected
+          if !app.connected
             a.btn.btn-primary.btn-small(href='/#{app.namespace}/login') Allow Access
           else
             p#access-granted Access Granted! 
@@ -35,8 +35,9 @@ block content
           if (fbuser && fbuser.name)
             span#hey-name
               b Hey #{fbuser.name}! 
-            span#not-you Not you? 
-          a#logout-link(href='/logout') Logout
+            a#logout-link(href='/logout') Not you? Logout
+          else
+            a#logout-link(href='/logout') Logout
       else
         a#login-link.right(href="/#{lifegraphNamespace}/login") Login to see what you've connected
 
