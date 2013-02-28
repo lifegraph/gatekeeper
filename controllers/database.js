@@ -63,6 +63,7 @@ exports.getApps = function (req, callback) {
       exports.getAuthTokens(item.namespace, helper.getSessionId(req), function (err, tokens) {
         if (!err && tokens) {
           item.connected = true;
+          item.tokens = tokens;
         }
         next(null, item);
       });

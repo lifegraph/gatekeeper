@@ -34,21 +34,27 @@ exports.lifeGraphSetUpMiddleWare = function (req, res, next) {
 exports.index = function (req, res) {
   database.getUserDevices(helper.getSessionId(req), function (err, devices) {
     database.getApps(req, function (err, apis) {
-      var lifegraphConnected = false;
+      var lifegraphConnected = false, lgtokens;
       apis = apis.filter(function(app) {
         if (app.namespace == req.app.get('fbapp')) { // check for the app running this connect server
-          lifegraphConnected = app.connected;
+          lifegraphConnected = true;
+          lgtokens = app.tokens;
           return false;
         }
         return true;
       });
-      res.render('index', {
-        title: 'Lifegraph Connect',
-        apps: apis || [],
-        devices: (helper.getSessionId(req) && devices) || [],
-        lifegraphConnected: lifegraphConnected,
-        lifegraphNamespace: req.app.get('fbapp'),
-        fbid: helper.getSessionId(req)
+
+      // Now get the name if we can.
+      helper.getUser(req, lgtokens, function(err, fbuser) {
+        res.render('index', {
+          title: 'Lifegraph Connect',
+          apps: apis || [],
+          devices: (helper.getSessionId(req) && devices) || [],
+          lifegraphConnected: lifegraphConnected,
+          lifegraphNamespace: req.app.get('fbapp'),
+          fbid: helper.getSessionId(req),
+          fbuser: fbuser
+        });
       });
     });
   });

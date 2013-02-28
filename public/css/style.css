@@ -48,8 +48,14 @@ body {
   font-size: 12px;
 }
 
+#hey-name {
+
+}
+
+#not-you,
 #logout-link {
   font-size: 15px;
+  color: #f0f0f0;
 }
 
 /*.unclaimed-token {
@@ -63,7 +69,7 @@ body {
   letter-spacing: 1px;
 }
 
-.header b {
+.header b#lifegraph-connect {
   font-size: 24px; 
   margin-right: 20px;
   letter-spacing: 0;
@@ -161,7 +167,7 @@ body {
 }
 
 #apps .app #revoke-access {
-  color: black;
+  color: #333;
   font-size: 12px;
   margin-top: auto;
   margin-bottom: auto;
