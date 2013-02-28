@@ -168,9 +168,9 @@ exports.callback = function (req, res) {
                   helper.setSessionId(req, json.id);
                   res.redirect('/');
                 });
-              })
+              });
             }
-          })
+          });
         }
       });
     });

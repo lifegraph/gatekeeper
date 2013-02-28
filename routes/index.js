@@ -37,8 +37,9 @@ exports.index = function (req, res) {
       var lifegraphConnected = false, lgtokens;
       apis = apis.filter(function(app) {
         if (app.namespace == req.app.get('fbapp')) { // check for the app running this connect server
-          lifegraphConnected = true;
+          lifegraphConnected = app.connected;
           lgtokens = app.tokens;
+          console.log(app);
           return false;
         }
         return true;
@@ -69,7 +70,7 @@ exports.logout = function (req, res) {
   database.getAuthTokens(req.app.get('fbapp'), helper.getSessionId(req), function (err, lgtokens) {
     if (lgtokens) {
       var access_token = lgtokens.tokens.oauthAccessToken;
-      var fbLogoutUri = 'https://www.facebook.com/logout.php?next=http://' + req.app.get('host') + '/' + req.app.get('fbapp') + '/revoke' +'/&access_token=' + access_token;
+      var fbLogoutUri = 'https://www.facebook.com/logout.php?next=http://' + req.app.get('host') + '/&access_token=' + access_token;
       helper.removeSessionId(req);
       res.redirect(fbLogoutUri);
     } else {
