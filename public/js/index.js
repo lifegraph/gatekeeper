@@ -1,9 +1,9 @@
 var socket = io.connect(window.location.protocol + '//' + window.location.host);
 socket.on('unmapped-pid', function (json) {
   console.log("YEAH")
-  if (!$('.app[data-namespace=' + json.namespace + ']')[0] || $('.app[data-namespace=' + json.namespace + ']').attr('data-connected') == undefined) {
-    return;
-  }
+  // if (!$('.app[data-namespace=' + json.namespace + ']')[0] || $('.app[data-namespace=' + json.namespace + ']').attr('data-connected') == undefined) {
+  //   return;
+  // }
   var $unclaimed_token = $('<div></div>');
   $unclaimed_token.addClass('alert').addClass('alert-info').addClass('unclaimed-token');
   $unclaimed_token.append($('<button/>').addClass('close').attr('type', 'button').attr('data-dismiss', 'alert').html('&times;'));
@@ -12,11 +12,13 @@ socket.on('unmapped-pid', function (json) {
   var $claim_button = $('<button/>').addClass('btn').addClass('btn-info').addClass('btn-small').css('margin-left', '15px').text('Claim this ID');
   $unclaimed_token.append($claim_button);
   $unclaimed_token.append($('<button/>').addClass('btn').addClass('btn-small').attr('type', 'button').attr('data-dismiss', 'alert').text('Dismiss'));
-
+  var dismissTimeout = setTimeout(function () {
+    $unclaimed_token.fadeOut(300, function() { $(this).remove(); });
+  }, 20 * 1000);
 
   $('#unclaimed-tokens').append($unclaimed_token);
   $claim_button.unbind().on('click', function () {
-
+    clearTimeout(dismissTimeout); // don't dismiss if clicked
     $.ajax({
     method: 'POST',
     url: '/api/tokens/' + json.pid,

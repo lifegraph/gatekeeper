@@ -44,7 +44,6 @@ body {
 }
 
 #token-help {
-  margin-bottom: 30px;
   color: #f0f0f0;
   font-size: 12px;
 }
@@ -53,9 +52,9 @@ body {
   font-size: 15px;
 }
 
-.unclaimed-token {
+/*.unclaimed-token {
   margin-top: -15px;
-}
+}*/
 
 .header p {
   font-size: 18px;
@@ -160,4 +159,8 @@ body {
 
 #footer a {
   color: #f0f0f0;
+}
+
+.bottomSpace { /* We need sass for constants */
+  margin-bottom: 15px;
 }
