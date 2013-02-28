@@ -31,10 +31,8 @@ body {
   font-size: 12px;
 }
 
-#token-help {
-  margin-bottom: 30px;
-  color: #f0f0f0;
-  font-size: 12px;
+#token-status a {
+  color:#f0f0f0;
 }
 
 #token-status span {
@@ -43,6 +41,16 @@ body {
 
 #token-status .label-success {
   cursor: pointer;
+}
+
+#token-help {
+  margin-bottom: 30px;
+  color: #f0f0f0;
+  font-size: 12px;
+}
+
+#logout-link {
+  font-size: 15px;
 }
 
 .unclaimed-token {
@@ -67,7 +75,7 @@ body {
   line-height: 20px;
   font-weight: 100;
   letter-spacing: 1px;
-  color: white;
+  color: #f0f0f0;
 }
 
 #apps .app .cover {
@@ -144,4 +152,12 @@ body {
 
 #token-status.label-warning {
   cursor: pointer;
+}
+
+#footer {
+  text-align: center;
+}
+
+#footer a {
+  color: #f0f0f0;
 }

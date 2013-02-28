@@ -6,10 +6,13 @@ mixin app(app)
       a.cover(href='/#{app.namespace}/login')
         img(src='#{app.image}')
       div.controls
-        if !app.connected
-          a.btn.btn-primary.btn-small(href='/#{app.namespace}/login') Connect
+        if lifegraphConnected
+          if !app.connected
+            a.btn.btn-primary.btn-small(href='/#{app.namespace}/login') Allow Access
+          else
+            a.btn.btn-danger.btn-tiny(href='/#{app.namespace}/revoke') Revoke Access
         else
-          a.btn.btn-danger.btn-small(href='/#{app.namespace}/logout') Revoke Access
+          a.btn.btn-primary.btn-small(href='/#{lifegraphNamespace}/login') Login to see access
       .description
         h3 #{app.name}
         p
@@ -27,20 +30,26 @@ block content
       b Lifegraph Connect
       |  Securely link your physical identity with your Facebook identity.
       if (lifegraphConnected)
-        a.right(href='/admin') Admin your apps
+        span.right
+          a#logout-link(href='/logout') Logout of Lifegraph Connect
       else
-        a.right(href="/#{lifegraphNamespace}/login") Developer? Login to admin your apps
+        a#login-link.right(href="/#{lifegraphNamespace}/login") Login to see what you've connected
 
   div.container-fluid
-    if devices.length
-      p#token-status Connected tokens:
-        each device in devices
-          span.label.label-success(data-pid=device.pid)
-            | ##{device.pid}
-      p#token-help Use any of these tokens to interact with the apps you've connected below!
+    if lifegraphConnected
+      if devices.length
+        p#token-status Connected tokens:
+          each device in devices
+            span.label.label-success(data-pid=device.pid)
+              | ##{device.pid}
+        p#token-help Use any of these tokens to interact with the apps you've connected below!
+      else
+        p#token-status
+          | No physical tokens connected.
     else
-      p#token-status
-        | No physical tokens connected.
+      p#token-status You must 
+        a(href="/#{lifegraphNamespace}/login") Login
+        |  to see your tokens.
 
     #unclaimed-tokens
 
@@ -52,4 +61,8 @@ block content
             +app(app) 
             if (i + 1 < apps.length)
               +app(apps[i+1])
+    if lifegraphConnected
+      hr
+      #footer
+        a#admin-link(href='/admin') Developer? Admin your apps
             

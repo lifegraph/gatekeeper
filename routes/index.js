@@ -53,3 +53,17 @@ exports.index = function (req, res) {
     });
   });
 }
+
+/*
+ * GET /logout
+ * logs out of lifegraph connect
+ */
+
+exports.logout = function (req, res) {
+  database.getAuthTokens(req.app.get('fbapp'), helper.getSessionId(req), function (err, lgtokens) {
+    var access_token = lgtokens.tokens.oauthAccessToken;
+    var fbLogoutUri = 'https://www.facebook.com/logout.php?next=http://' + req.app.get('host') + '/&access_token=' + access_token;
+    helper.removeSessionId(req);
+    res.redirect(fbLogoutUri);
+  });
+}

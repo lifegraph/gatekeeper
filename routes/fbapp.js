@@ -178,14 +178,13 @@ exports.callback = function (req, res) {
 };
 
 /*
- * GET /:fbapp/logout
+ * GET /:fbapp/revoke
  *
- * Lets the user logout of the app.
+ * Lets the user revoke access of the app.
  */
 
-exports.logout = function (req, res) {
+exports.revokeAccess = function (req, res) {
   database.deleteAuthTokens(req.params.fbapp, helper.getSessionId(req), function () {
-    helper.removeSessionId(req);
     res.redirect('/');
   });
 }

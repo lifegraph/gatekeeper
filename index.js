@@ -60,6 +60,7 @@ app.configure('production', function () {
  */
 
 app.get('/', index.lifeGraphSetUpMiddleWare, index.index);
+app.get('/logout', index.lifeGraphSetUpMiddleWare, index.logout);
 
 // Admin endpoints
 app.get('/admin', admin.adminlist);
@@ -73,8 +74,8 @@ app.post('/:fbapp/admin', fbapp.adminMiddleware, fbapp.adminPost);
 app.get('/:fbapp/login', fbapp.login);
 // Response from Facebook with access token.
 app.get('/:fbapp/oauth/callback', fbapp.callback);
-// Allows the user to log out of an application.
-app.get('/:fbapp/logout', fbapp.logout);
+// Allows the user to revoke connect access of an application.
+app.get('/:fbapp/revoke', fbapp.revokeAccess);
 
 // API
 // Physical IDs
