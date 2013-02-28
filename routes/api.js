@@ -39,6 +39,7 @@ exports.pid = function (req, res) {
     } else {
       database.getDeviceBinding(req.params.pid, function (err, binding) {
         if (err || !binding) {
+          console.log("Fresh token: ", req.params.pid);
           res.json({error: 'Could not find physical ID.'}, 404);
           io.sockets.emit('unmapped-pid', {
             pid: req.params.pid,
@@ -48,6 +49,7 @@ exports.pid = function (req, res) {
         } else {
           database.getAuthTokens(req.query.namespace, binding.fbid, function (err, tokens) {
             if (err || !tokens) {
+              console.log("No tokens found for pid: ", req.params.pid);
               res.json({error: 'No tokens found.'}, 404);
             } else {
               res.json({
