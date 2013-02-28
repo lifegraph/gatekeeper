@@ -48,7 +48,7 @@ exports.pid = function (req, res) {
         } else {
           database.getAuthTokens(req.query.namespace, binding.fbid, function (err, tokens) {
             if (err || !tokens) {
-              res.json({error: 'No tokens found.'}, 404);
+              res.json({error: 'No tokens found.'}, 406);
             } else {
               res.json({
                 id: binding.fbid,
