@@ -184,7 +184,6 @@ exports.callback = function (req, res) {
  */
 
 exports.revokeAccess = function (req, res) {
-  console.log("revoking access for", helper.getSessionId(req), "on", req.params.fbapp);
   database.deleteAuthTokens(req.params.fbapp, helper.getSessionId(req), function () {
     res.redirect('/');
   });

@@ -39,7 +39,6 @@ exports.index = function (req, res) {
         if (app.namespace == req.app.get('fbapp')) { // check for the app running this connect server
           lifegraphConnected = app.connected;
           lgtokens = app.tokens;
-          console.log(app);
           return false;
         }
         return true;
