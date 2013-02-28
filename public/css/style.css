@@ -153,6 +153,20 @@ body {
   cursor: pointer;
 }
 
+#apps .app #access-granted {
+  color: green;
+  font-size: 18px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+#apps .app #revoke-access {
+  color: black;
+  font-size: 12px;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
 #footer {
   text-align: center;
 }

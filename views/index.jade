@@ -10,7 +10,8 @@ mixin app(app)
           if !app.connected
             a.btn.btn-primary.btn-small(href='/#{app.namespace}/login') Allow Access
           else
-            a.btn.btn-danger.btn-tiny(href='/#{app.namespace}/revoke') Revoke Access
+            p#access-granted Access Granted! 
+              a#revoke-access(href='/#{app.namespace}/revoke') Revoke Access
         else
           a.btn.btn-primary.btn-small(href='/#{lifegraphNamespace}/login') Login to see access
       .description
