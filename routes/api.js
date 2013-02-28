@@ -42,21 +42,26 @@ exports.pid = function (req, res) {
       database.getDeviceBinding(req.params.pid, function (err, binding) {
         if (err || !binding) {
           console.log("Fresh token: ", req.params.pid);
-          res.json({error: 'Could not find physical ID.'}, 404);
-          io.sockets.emit('unmapped-pid', {
-            pid: req.params.pid,
-            namespace: req.query.namespace
+          database.incrementActivity(req.query.namespace, false, function () {
+            res.json({error: 'Could not find physical ID.'}, 404);
+            io.sockets.emit('unmapped-pid', {
+              pid: req.params.pid,
+              namespace: req.query.namespace
+            });
           });
-
         } else {
           database.getAuthTokens(req.query.namespace, binding.fbid, function (err, tokens) {
             if (err || !tokens) {
-              res.json({error: 'No tokens found.'}, 406);
-              console.log("No tokens found for pid: ", req.params.pid);
+              database.incrementActivityNoTokens(req.query.namespace, function () {
+                console.log("No tokens found for pid: ", req.params.pid);
+                res.json({error: 'No tokens found.'}, 406);
+              });
             } else {
-              res.json({
-                id: binding.fbid,
-                tokens: tokens.tokens
+              database.incrementActivity(req.query.namespace, true, function () {
+                res.json({
+                  id: binding.fbid,
+                  tokens: tokens.tokens
+                });
               });
             }
           })

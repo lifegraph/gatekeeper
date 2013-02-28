@@ -13,7 +13,8 @@ console.log(process.env.MONGOLAB_URI);
 var db = mongojs(process.env.MONGOLAB_URI || 'gate-keeper', [
   'api_keys',
   'auth_tokens',
-  'pids'
+  'pids',
+  'activity'
 ]);
 
 exports.getDeviceBinding = function (pid, next) {
@@ -119,5 +120,32 @@ exports.deleteAuthTokens = function (namespace, fbid, next) {
   db.auth_tokens.remove({
     namespace: namespace,
     fbid: fbid
+  }, next);
+}
+
+// logs when an app got a successful activity
+// bounded - boolean to see if it is bounded to a person or a new one
+exports.incrementActivity = function (namespace, bounded, next) {
+  // console.log("Incrementing activity on " + namespace, bounded);
+  if (bounded) {
+    db.activity.update({namespace: namespace}, {$inc:{bounded:1}}, {
+      safe: true,
+      upsert: true
+    }, next);
+  } else {
+    db.activity.update({namespace: namespace}, {$inc:{unbounded:1}}, {
+      safe: true,
+      upsert: true
+    }, next);
+  }
+}
+
+// logs that a namespace had a request that had no tokens, but was bounded
+// probably means the person wasn't authed with this particular namespace, but we know who they are (revoked access possibly)
+exports.incrementActivityNoTokens = function (namespace, next) {
+  // console.log("Incrementing no token activity on " + namespace);
+  db.activity.update({namespace: namespace}, {$inc:{notokens:1}}, {
+    safe: true,
+    upsert: true
   }, next);
 }
