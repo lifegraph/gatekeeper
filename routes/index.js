@@ -69,7 +69,7 @@ exports.logout = function (req, res) {
   database.getAuthTokens(req.app.get('fbapp'), helper.getSessionId(req), function (err, lgtokens) {
     if (lgtokens) {
       var access_token = lgtokens.tokens.oauthAccessToken;
-      var fbLogoutUri = 'https://www.facebook.com/logout.php?next=http://' + req.app.get('host') + '/' + req.app.get('fbapp') + '/logout' +'/&access_token=' + access_token;
+      var fbLogoutUri = 'https://www.facebook.com/logout.php?next=http://' + req.app.get('host') + '/' + req.app.get('fbapp') + '/revoke' +'/&access_token=' + access_token;
       helper.removeSessionId(req);
       res.redirect(fbLogoutUri);
     } else {
