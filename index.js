@@ -52,7 +52,7 @@ app.configure('development', function () {
 
 app.configure('production', function () {
   app.set('fbapp', 'lifegraph');
-  app.set('host', 'connect.lifegraphlabs.com')
+  app.set('host', 'lifegraphconnect.com')
 })
 
 /**
