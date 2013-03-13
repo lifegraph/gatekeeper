@@ -39,8 +39,8 @@ exports.pid = function (req, res) {
       // console.log(config, req.query);
       res.json({error: 'Invalid credentials.'}, 401);
     } else {
-      database.getDeviceBinding(req.params.pid, function (err, binding) {
-        if (err || !binding) {
+      database.activateDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
+        if (err) {
           console.log("Fresh token: ", req.params.pid);
           database.incrementActivity(req.query.namespace, false, function () {
             res.json({error: 'Could not find physical ID.'}, 404);
@@ -66,7 +66,7 @@ exports.pid = function (req, res) {
             }
           })
         }
-      })
+      });
     }
   });
 };
@@ -79,12 +79,9 @@ exports.pid = function (req, res) {
 
 exports.pidPost = function (req, res) {
   console.log('get binding');
-  database.getDeviceBinding(req.params.pid, function (err, binding) {
+  database.activateDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
     if (err || !binding) {
-      database.setDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
-        console.log('Device', req.params.pid, 'bound to', req.query.namespace, 'user', helper.getSessionId(req));
-        res.json({error: false, message: 'Cool digs man.'}, 201);
-      });
+      res.json({error: false, message: 'Cool digs man.'}, 201);
     } else {
       res.json({error: true, message: 'Device already associated with this account. Please unbind first.'}, 401);
     }

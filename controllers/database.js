@@ -41,6 +41,19 @@ exports.setDeviceBinding = function (pid, fbid, next) {
   }, next); 
 }
 
+exports.activateDeviceBinding = function (pid, fbid, next) {
+  exports.getDeviceBinding(pid, function (err, binding) {
+    if (err || !binding) {
+      exports.setDeviceBinding(pid, fbid, function (err) {
+        console.log('Device', pid, 'user', fbid);
+        next(null);
+      });
+    } else {
+      next(err);
+    }
+  });
+}
+
 exports.removeDeviceBinding = function (pid, fbid, next) {
   db.pids.remove({
     "pid": pid,
@@ -58,6 +71,7 @@ exports.getApps = function (req, callback) {
         image: c.image,
         description: c.description,
         name: c.name,
+        callback_url: c.callback_url,
         connected: false
       };
     }), function (item, next) {

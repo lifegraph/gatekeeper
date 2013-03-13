@@ -66,6 +66,9 @@ app.get('/logout', index.lifeGraphSetUpMiddleWare, index.logout);
 app.get('/admin', admin.adminlist);
 
 // FB App endpoints
+
+// we are syncing a pid to this app
+app.get('/:fbapp/sync/:pid', fbapp.sync)
 // Administration control panel.
 app.get('/:fbapp/admin', fbapp.adminMiddleware, fbapp.admin);
 // Update device administration.
@@ -74,6 +77,8 @@ app.post('/:fbapp/admin', fbapp.adminMiddleware, fbapp.adminPost);
 app.get('/:fbapp/login', fbapp.login);
 // Response from Facebook with access token.
 app.get('/:fbapp/oauth/callback', fbapp.callback);
+// Response from Facebook for physical syncing (person tapped on app and wants to one-in sync).
+app.get('/:fbapp/oauth/callback/physical', fbapp.physicalcallback);
 // Allows the user to revoke connect access of an application.
 app.get('/:fbapp/revoke', fbapp.revokeAccess);
 

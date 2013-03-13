@@ -72,7 +72,6 @@ exports.adminMiddleware = function (req, res, next) {
  * Administration for each fb app.
  */
 
-
 exports.admin = function (req, res) {
   database.getApiConfig(req.params.fbapp, function (err, apiconfig) {
     res.render('admin', {
@@ -104,6 +103,133 @@ exports.adminPost = function (req, res) {
   }
   database.setApiConfig(req.params.fbapp, props, function () {
     res.redirect('/' + req.params.fbapp + '/admin');
+  });
+};
+
+/*
+ * GET /:fbapp/sync/:pid
+ *
+ * Endpint to redirect people to to authenticate with this app.
+ */
+
+exports.sync = function (req, res) {
+  req.session.pid = req.params.pid;
+  database.getApiConfig(req.params.fbapp, function (err, config) {
+    if (!config) {
+      return res.send('No app found.', 404);
+    }
+
+    // Create Facebook client.
+    var fb = rem.connect('facebook.com', '*').configure({
+      key: config.api_key,
+      secret: config.secret_key
+    });
+
+    // Start oauth login.
+    var oauth = rem.oauth(fb, 'http://' + req.app.get('host') + '/' + req.params.fbapp + '/oauth/callback/physical');
+    oauth.start({
+      scope: config.permissions
+    }, function (url) {
+      res.redirect(url);
+    });
+  });
+
+
+
+  ///// returns all the apps for the index page
+  // database.getUserDevices(helper.getSessionId(req), function (err, devices) {
+  //   database.getApps(req, function (err, apis) {
+  //     var lifegraphConnected = false, lgtokens;
+  //     apis = apis.filter(function(app) {
+  //       if (app.namespace == req.app.get('fbapp')) { // check for the app running this connect server
+  //         lifegraphConnected = app.connected;
+  //         lgtokens = app.tokens;
+  //         return false;
+  //       }
+  //       return true;
+  //     });
+
+  //     // Now get the name if we can.
+  //     helper.getUser(req, lgtokens, function(err, fbuser) {
+  //       res.render('index', {
+  //         title: 'Lifegraph Connect',
+  //         apps: apis || [],
+  //         devices: (helper.getSessionId(req) && devices) || [],
+  //         lifegraphConnected: lifegraphConnected,
+  //         lifegraphNamespace: req.app.get('fbapp'),
+  //         fbid: helper.getSessionId(req),
+  //         fbuser: fbuser
+  //       });
+  //     });
+  //   });
+  // });
+
+
+  //// binding the PID to the req.session user
+  database.getDeviceBinding(req.params.pid, function (err, binding) {
+    if (err || !binding) {
+      database.setDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
+        console.log('Device', req.params.pid, 'bound to', req.query.namespace, 'user', helper.getSessionId(req));
+        res.json({error: false, message: 'Cool digs man.'}, 201);
+      });
+    } else {
+      res.json({error: true, message: 'Device already associated with this account. Please unbind first.'}, 401);
+    }
+  });
+};
+
+/*
+ * GET /:fbapp/oauth/callback/physical
+ *
+ * FB callback for oauth for this specific fbapp when doing physical syncing
+ */
+
+exports.physicalcallback = function (req, res) {
+  console.log("HIT PHYSICAL CALLBACK for", req.params.fbapp);
+  database.getApiConfig(req.params.fbapp, function (err, apiConfig) {
+    // Create Facebook client.
+    var fb = rem.connect('facebook.com', '*').configure({
+      secret: apiConfig.secret_key,
+      key: apiConfig.api_key,
+    });
+
+    // Start and complete oauth.
+    var oauth = rem.oauth(fb, 'http://' + req.app.get('host') + '/' + req.params.fbapp + '/oauth/callback');
+    oauth.start({
+      scope: apiConfig.permissions
+    }, function (url) {
+      oauth.complete(req.url, function (err, user) {
+        if (err) {
+          res.send('Invalid login credentials or invalid app configuration.');
+        } else {
+          // Get basic info.
+          user('me').get(function (err, json) {
+            if (err) {
+              res.send('Could not retrieve user information.');
+            } else {
+              user.saveState(function (state) {
+                database.storeAuthTokens(req.params.fbapp, json.id, state, function () {
+                  helper.setSessionId(req, json.id);
+                  
+                    // Now we store the pid binding
+                    database.activateDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
+                      if (err || !binding) {
+                        // Everything is okay, and we can redirect back
+                        res.redirect(apiConfig.callback_url);
+                        // res.json({error: false, message: 'Cool digs man.'}, 201);
+                      } else {
+                        // Someone f'd our s
+                        res.json({error: true, message: 'Device already associated with this account. Please unbind first or get a different ID.'}, 401);
+                      }
+                    });
+
+                });
+              });
+            }
+          });
+        }
+      });
+    });
   });
 };
 
@@ -142,6 +268,7 @@ exports.login = function (req, res) {
  */
 
 exports.callback = function (req, res) {
+  console.log("HIT CALLBACK for", req.params.fbapp);
   database.getApiConfig(req.params.fbapp, function (err, keys) {
     // Create Facebook client.
     var fb = rem.connect('facebook.com', '*').configure({
