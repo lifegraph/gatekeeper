@@ -169,21 +169,22 @@ exports.physicalcallback = function (req, res) {
                   
                     // Now we store the pid binding
                     console.log("Right before activation", "pid", req.session.pid, "id", json.id);
-                    database.activateDeviceBinding(req.session.pid, json.id, function (err) {
-                      if (!err) { // no error means that this thing hasn't been already synced
-                        // Everything is okay, and we can redirect back, first logging them out
-                        var fbLogoutUri = 'https://www.facebook.com/logout.php?next=' + apiConfig.callback_url + '&access_token=' + state.oauthAccessToken;
-                        // console.log(fbLogoutUri);
-                        res.redirect(fbLogoutUri);
-                        // res.json({error: false, message: 'Cool digs man.'}, 201);
-                      } else { // already synced things are bad, bad news
-                        // Someone f'd our s
+                    database.getDeviceBinding(req.session.pid, function (err, binding) {
+                      if (err || !binding || binding.fbid == json.id) { // this means it hasn't been taken, which is good
+                        database.setDeviceBinding(req.session.pid, json.id, function (err) {
+                          console.log('Device', req.session.pid, 'user', json.id);
+                          // Everything is okay, and we can redirect back, first logging them out
+                          var fbLogoutUri = 'https://www.facebook.com/logout.php?next=' + apiConfig.callback_url + '&access_token=' + state.oauthAccessToken;
+                          // console.log(fbLogoutUri);
+                          res.redirect(fbLogoutUri);
+                        });
+                      } else { // this is taken, and bad
                         console.log("SYNC ERROR:");
                         console.log(err);
+                        console.log(json.id);
                         res.json({error: true, message: 'Device already associated with this account. Please unbind first or get a different ID.'}, 401);
                       }
                     });
-
                 });
               });
             }

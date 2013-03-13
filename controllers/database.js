@@ -29,7 +29,7 @@ exports.getUserDevices = function (fbid, next) {
   }, next);
 }
 
-setDeviceBinding = function (pid, fbid, next) {
+exports.setDeviceBinding = function (pid, fbid, next) {
   db.pids.update({
     "pid": pid
   }, {
@@ -39,21 +39,6 @@ setDeviceBinding = function (pid, fbid, next) {
     upsert: true,
     safe: true
   }, next); 
-}
-
-// we want to set the decice binding, but make sure it isn't already set
-// if it is already set, that is an error because then we would have multiple bindings
-exports.activateDeviceBinding = function (pid, fbid, next) {
-  exports.getDeviceBinding(pid, function (err, binding) {
-    if (err || !binding) { // this means it hasn't been taken, which is good
-      setDeviceBinding(pid, fbid, function (err) {
-        console.log('Device', pid, 'user', fbid);
-        next(null);
-      });
-    } else { // this is taken, and bad
-      next({message: "device already taken or error", binding: binding, err: err});
-    }
-  });
 }
 
 exports.removeDeviceBinding = function (pid, fbid, next) {

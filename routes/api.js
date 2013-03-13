@@ -79,10 +79,13 @@ exports.pid = function (req, res) {
 
 exports.pidPost = function (req, res) {
   console.log('post binding', 'pid', req.params.pid, 'user', helper.getSessionId(req));
-  database.activateDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
-    if (!err) { // no error means that it has not been already taken, and things are cool digs, man.
-      res.json({error: false, message: 'Cool digs man.'}, 201);
-    } else { // trying to sync multiple accounts to a device id is some f'd up s
+  database.getDeviceBinding(req.params.pid, function (err, binding) {
+    if (err || !binding) { // this means it hasn't been taken, which is good
+      database.setDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
+        console.log('Device', req.params.pid, 'user', helper.getSessionId(req));
+        res.json({error: false, message: 'Cool digs man.'}, 201);
+      });
+    } else { // this is taken, and bad
       res.json({error: true, message: 'Device already associated with this account. Please unbind first.'}, 401);
     }
   });
