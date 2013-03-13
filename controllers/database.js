@@ -51,7 +51,7 @@ exports.activateDeviceBinding = function (pid, fbid, next) {
         next(null);
       });
     } else { // this is taken, and bad
-      next({error: "device already taken or error"});
+      next({message: "device already taken or error", binding: binding, err: err});
     }
   });
 }
