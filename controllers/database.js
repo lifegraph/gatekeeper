@@ -29,7 +29,7 @@ exports.getUserDevices = function (fbid, next) {
   }, next);
 }
 
-exports.setDeviceBinding = function (pid, fbid, next) {
+setDeviceBinding = function (pid, fbid, next) {
   db.pids.update({
     "pid": pid
   }, {
@@ -46,7 +46,7 @@ exports.setDeviceBinding = function (pid, fbid, next) {
 exports.activateDeviceBinding = function (pid, fbid, next) {
   exports.getDeviceBinding(pid, function (err, binding) {
     if (err || !binding) { // this means it hasn't been taken, which is good
-      exports.setDeviceBinding(pid, fbid, function (err) {
+      setDeviceBinding(pid, fbid, function (err) {
         console.log('Device', pid, 'user', fbid);
         next(null);
       });
