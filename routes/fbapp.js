@@ -213,7 +213,7 @@ exports.physicalcallback = function (req, res) {
                   
                     // Now we store the pid binding
                     database.activateDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
-                      if (err || !binding) {
+                      if (err) {
                         // Everything is okay, and we can redirect back
                         res.redirect(apiConfig.callback_url);
                         // res.json({error: false, message: 'Cool digs man.'}, 201);
