@@ -39,8 +39,8 @@ exports.pid = function (req, res) {
       // console.log(config, req.query);
       res.json({error: 'Invalid credentials.'}, 401);
     } else {
-      database.activateDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
-        if (!err) { // no error means that it hasn't already been taken, and is a fresh token
+      database.getDeviceBinding(req.params.pid, function (err, binding) {
+        if (err || !binding) { 
           console.log("Fresh token: ", req.params.pid);
           database.incrementActivity(req.query.namespace, false, function () {
             res.json({error: 'Could not find physical ID.'}, 404);
@@ -64,7 +64,7 @@ exports.pid = function (req, res) {
                 });
               });
             }
-          })
+          });
         }
       });
     }
