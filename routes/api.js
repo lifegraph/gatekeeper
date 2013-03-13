@@ -78,7 +78,7 @@ exports.pid = function (req, res) {
  */
 
 exports.pidPost = function (req, res) {
-  console.log('get binding');
+  console.log('post binding', 'pid', req.params.pid, 'user', helper.getSessionId(req));
   database.activateDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
     if (!err) { // no error means that it has not been already taken, and things are cool digs, man.
       res.json({error: false, message: 'Cool digs man.'}, 201);
