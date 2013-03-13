@@ -194,13 +194,13 @@ exports.physicalcallback = function (req, res) {
     });
 
     // Start and complete oauth.
-    var oauth = rem.oauth(fb, 'http://' + req.app.get('host') + '/' + req.params.fbapp + '/oauth/callback');
+    var oauth = rem.oauth(fb, 'http://' + req.app.get('host') + '/' + req.params.fbapp + '/oauth/callback/physical');
     oauth.start({
       scope: apiConfig.permissions
     }, function (url) {
       oauth.complete(req.url, function (err, user) {
         if (err) {
-          res.send('Invalid login credentials or invalid app configuration.');
+          res.json({message: 'Invalid login credentials or invalid app configuration.', err:err});
         } else {
           // Get basic info.
           user('me').get(function (err, json) {
