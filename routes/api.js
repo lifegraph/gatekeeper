@@ -40,7 +40,7 @@ exports.pid = function (req, res) {
       res.json({error: 'Invalid credentials.'}, 401);
     } else {
       database.activateDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
-        if (err) {
+        if (!err) { // no error means that it hasn't already been taken, and is a fresh token
           console.log("Fresh token: ", req.params.pid);
           database.incrementActivity(req.query.namespace, false, function () {
             res.json({error: 'Could not find physical ID.'}, 404);
@@ -80,9 +80,9 @@ exports.pid = function (req, res) {
 exports.pidPost = function (req, res) {
   console.log('get binding');
   database.activateDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
-    if (err || !binding) {
+    if (!err) { // no error means that it has not been already taken, and things are cool digs, man.
       res.json({error: false, message: 'Cool digs man.'}, 201);
-    } else {
+    } else { // trying to sync multiple accounts to a device id is some f'd up s
       res.json({error: true, message: 'Device already associated with this account. Please unbind first.'}, 401);
     }
   });

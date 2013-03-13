@@ -41,15 +41,17 @@ exports.setDeviceBinding = function (pid, fbid, next) {
   }, next); 
 }
 
+// we want to set the decice binding, but make sure it isn't already set
+// if it is already set, that is an error because then we would have multiple bindings
 exports.activateDeviceBinding = function (pid, fbid, next) {
   exports.getDeviceBinding(pid, function (err, binding) {
-    if (err || !binding) {
+    if (err || !binding) { // this means it hasn't been taken, which is good
       exports.setDeviceBinding(pid, fbid, function (err) {
         console.log('Device', pid, 'user', fbid);
         next(null);
       });
-    } else {
-      next(err);
+    } else { // this is taken, and bad
+      next({error: "device already taken or error"});
     }
   });
 }

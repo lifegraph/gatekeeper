@@ -133,49 +133,6 @@ exports.sync = function (req, res) {
       res.redirect(url);
     });
   });
-
-
-
-  ///// returns all the apps for the index page
-  // database.getUserDevices(helper.getSessionId(req), function (err, devices) {
-  //   database.getApps(req, function (err, apis) {
-  //     var lifegraphConnected = false, lgtokens;
-  //     apis = apis.filter(function(app) {
-  //       if (app.namespace == req.app.get('fbapp')) { // check for the app running this connect server
-  //         lifegraphConnected = app.connected;
-  //         lgtokens = app.tokens;
-  //         return false;
-  //       }
-  //       return true;
-  //     });
-
-  //     // Now get the name if we can.
-  //     helper.getUser(req, lgtokens, function(err, fbuser) {
-  //       res.render('index', {
-  //         title: 'Lifegraph Connect',
-  //         apps: apis || [],
-  //         devices: (helper.getSessionId(req) && devices) || [],
-  //         lifegraphConnected: lifegraphConnected,
-  //         lifegraphNamespace: req.app.get('fbapp'),
-  //         fbid: helper.getSessionId(req),
-  //         fbuser: fbuser
-  //       });
-  //     });
-  //   });
-  // });
-
-
-  //// binding the PID to the req.session user
-  database.getDeviceBinding(req.params.pid, function (err, binding) {
-    if (err || !binding) {
-      database.setDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
-        console.log('Device', req.params.pid, 'bound to', req.query.namespace, 'user', helper.getSessionId(req));
-        res.json({error: false, message: 'Cool digs man.'}, 201);
-      });
-    } else {
-      res.json({error: true, message: 'Device already associated with this account. Please unbind first.'}, 401);
-    }
-  });
 };
 
 /*
@@ -209,15 +166,17 @@ exports.physicalcallback = function (req, res) {
             } else {
               user.saveState(function (state) {
                 database.storeAuthTokens(req.params.fbapp, json.id, state, function () {
-                  helper.setSessionId(req, json.id);
                   
                     // Now we store the pid binding
-                    database.activateDeviceBinding(req.params.pid, helper.getSessionId(req), function (err) {
-                      if (err) {
+                    console.log("Right before activation", "pid", req.session.pid, "id", json.id);
+                    database.activateDeviceBinding(req.session.pid, json.id, function (err) {
+                      if (!err) { // no error means that this thing hasn't been already synced
                         // Everything is okay, and we can redirect back
-                        res.redirect(apiConfig.callback_url);
+                        var fbLogoutUri = 'https://www.facebook.com/logout.php?next=' + apiConfig.callback_url + '&access_token=' + state.oauthAccessToken;
+                        // console.log(fbLogoutUri);
+                        res.redirect(fbLogoutUri);
                         // res.json({error: false, message: 'Cool digs man.'}, 201);
-                      } else {
+                      } else { // already synced things are bad, bad news
                         // Someone f'd our s
                         res.json({error: true, message: 'Device already associated with this account. Please unbind first or get a different ID.'}, 401);
                       }
