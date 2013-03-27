@@ -107,6 +107,83 @@ exports.adminPost = function (req, res) {
 };
 
 /*
+ * GET /:fbapp
+ *
+ * Endpoint to get connected on your phone.
+ */
+
+exports.fbapp = function(req, res) {
+  database.getApiConfig(req.params.fbapp, function (err, config) {
+    if (!config) {
+      return res.send('No app found.', 404);
+    }
+
+    // Create Facebook client.
+    var fb = rem.connect('facebook.com', '*').configure({
+      key: config.api_key,
+      secret: config.secret_key
+    });
+
+    // Start oauth login.
+    var oauth = rem.oauth(fb, 'http://' + req.app.get('host') + '/' + req.params.fbapp + '/oauth/callback/fbapp');
+    oauth.start({
+      scope: config.permissions
+    }, function (url) {
+      res.redirect(url);
+    });
+  });
+}
+
+/*
+ * GET /:fbapp/oauth/callback/fbapp
+ *
+ * FB callback for oauth for this specific fbapp when doing mobile device, app-specific syncing (went to /:fbapp)
+ */
+
+exports.fbappcallback = function (req, res) {
+  console.log("HIT App CALLBACK for", req.params.fbapp);
+  database.getApiConfig(req.params.fbapp, function (err, apiConfig) {
+    // Create Facebook client.
+    var fb = rem.connect('facebook.com', '*').configure({
+      secret: apiConfig.secret_key,
+      key: apiConfig.api_key,
+    });
+
+    // Start and complete oauth.
+    var oauth = rem.oauth(fb, 'http://' + req.app.get('host') + '/' + req.params.fbapp + '/oauth/callback/fbapp');
+    oauth.start({
+      scope: apiConfig.permissions
+    }, function (url) {
+      oauth.complete(req.url, function (err, user) {
+        if (err) {
+          res.json({message: 'Invalid login credentials or invalid app configuration.', err:err});
+        } else {
+          // Get basic info.
+          user('me').get(function (err, json) {
+            if (err) {
+              res.send('Could not retrieve user information.');
+            } else {
+              user.saveState(function (state) {
+                database.storeAuthTokens(req.params.fbapp, json.id, state, function () {
+                  helper.setSessionId(req, json.id);
+                  database.getUserDevices(json.id, function (err, devices) {
+                    if (!err && devices && devices.length) { // we have devices already
+                      res.redirect('/');
+                    } else {
+                      res.redirect('/');
+                    }
+                  });
+                });
+              });
+            }
+          });
+        }
+      });
+    });
+  });
+};
+
+/*
  * GET /:fbapp/sync/:pid
  *
  * Endpint to redirect people to to authenticate with this app.
@@ -168,7 +245,6 @@ exports.physicalcallback = function (req, res) {
                 database.storeAuthTokens(req.params.fbapp, json.id, state, function () {
                   
                     // Now we store the pid binding
-                    console.log("Right before activation", "pid", req.session.pid, "id", json.id);
                     database.getDeviceBinding(req.session.pid, function (err, binding) {
                       if (err || !binding || binding.fbid == json.id) { // this means it hasn't been taken, which is good
                         database.setDeviceBinding(req.session.pid, json.id, function (err) {

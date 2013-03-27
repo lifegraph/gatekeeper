@@ -73,12 +73,16 @@ app.get('/:fbapp/sync/:pid', fbapp.sync)
 app.get('/:fbapp/admin', fbapp.adminMiddleware, fbapp.admin);
 // Update device administration.
 app.post('/:fbapp/admin', fbapp.adminMiddleware, fbapp.adminPost);
+// sync with project with no screen
+app.get('/:fbapp', fbapp.fbapp);
 // First part of Facebook auth dance.
 app.get('/:fbapp/login', fbapp.login);
 // Response from Facebook with access token.
 app.get('/:fbapp/oauth/callback', fbapp.callback);
 // Response from Facebook for physical syncing (person tapped on app and wants to one-in sync).
 app.get('/:fbapp/oauth/callback/physical', fbapp.physicalcallback);
+// Response from Facebook for non-screen project, probably a phone.
+app.get('/:fbapp/oauth/callback/fbapp', fbapp.fbappcallback);
 // Allows the user to revoke connect access of an application.
 app.get('/:fbapp/revoke', fbapp.revokeAccess);
 

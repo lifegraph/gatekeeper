@@ -158,6 +158,10 @@ body {
   cursor: pointer;
 }
 
+#token-status.big {
+  font-size: 20px;
+}
+
 #apps .app #access-granted {
   color: green;
   font-size: 18px;

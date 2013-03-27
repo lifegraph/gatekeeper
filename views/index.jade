@@ -50,10 +50,10 @@ block content
               | ##{device.pid}
         p#token-help.bottomSpace Use any of these tokens to interact with the apps you've connected below!
       else
-        p#token-status.bottomSpace
-          | No physical tokens connected.
+        p#token-status.bottomSpace.big
+          | You have no tokens associated with your account. Tap a card now and claim the ID!
     else
-      p#token-status You must 
+      p#token-status.big You must 
         a(href="/#{lifegraphNamespace}/login") Login
         |  to see your tokens.
 
