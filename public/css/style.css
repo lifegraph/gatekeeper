@@ -195,6 +195,10 @@ body {
   padding-bottom: 20px;
 }
 
+.view-token {
+  float:left;
+}
+
 .token {
   font-family: Courier, Monospace;
   padding-left: 20px;
