@@ -365,12 +365,15 @@ exports.revokeAccess = function (req, res) {
     return res.redirect('/');
   }
   // database.getApiConfig(req.app.get('fbapp'), function (err, lgconfig) {
-    database.getAuthTokens(req.app.get('fbapp'), helper.getSessionId(req), function (err, lgtokens) {
+    database.getAuthTokens(req.params.fbapp, helper.getSessionId(req), function (err, lgtokens) {
+      if (err) {
+        return res.redirect('/');
+      }
       helper.getUser(req, lgtokens, function(err, fbuser) {
         res.render('authToken', { 
           title: 'lifegraph Connect', 
           lifegraphConnected: true, 
-          app: req.app.get('fbapp'), 
+          app: req.params.fbapp, 
           token: lgtokens.tokens.oauthAccessToken,
           fbuser: fbuser
         });
