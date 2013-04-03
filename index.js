@@ -85,6 +85,8 @@ app.get('/:fbapp/oauth/callback/physical', fbapp.physicalcallback);
 app.get('/:fbapp/oauth/callback/fbapp', fbapp.fbappcallback);
 // Allows the user to revoke connect access of an application.
 app.get('/:fbapp/revoke', fbapp.revokeAccess);
+// shows the user their auth token
+app.get('/:fbapp/authToken', fbapp.getAuthToken);
 
 // API
 // Physical IDs

@@ -353,3 +353,31 @@ exports.revokeAccess = function (req, res) {
     res.redirect('/');
   });
 }
+
+/*
+ * GET /:fbapp/authToken
+ *
+ * Lets the user see their own auth token for the app.
+ */
+
+ exports.getAuthToken = function (req, res) {
+  if ((req.app.get('fbapp') != req.params.fbapp) || 
+    (typeof(helper.getSessionId(req)) == "undefined")) {
+    return res.redirect('/');
+  }
+  database.getApiConfig(req.app.get('fbapp'), function (err, lgconfig) {
+    database.getAuthTokens(req.app.get('fbapp'), helper.getSessionId(req), function (err, lgtokens) {
+      helper.getUser(req, lgtokens, function(err, fbuser) {
+        res.render('authToken', { 
+          title: 'lifegraph Connect', 
+          lifegraphConnected: true, 
+          app: req.app.get('fbapp'), 
+          token: lgtokens.tokens.oauthAccessToken,
+          fbuser: fbuser
+        });
+      });
+    });
+  });
+ }
+
+

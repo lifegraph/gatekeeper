@@ -187,3 +187,18 @@ body {
 .bottomSpace { /* We need sass for constants */
   margin-bottom: 15px;
 }
+
+.tokenText {
+  font-size: 15px;
+  font-weight: bold;
+  color: white;
+  padding-bottom: 20px;
+}
+
+.token {
+  font-family: Courier, Monospace;
+  padding-left: 20px;
+  background-color: #A7A7A7;
+  color: #494949;
+  font-weight: bold;
+}
