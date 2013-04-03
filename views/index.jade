@@ -4,7 +4,10 @@ mixin app(app)
   .span6.app(data-connected=app.connected, data-namespace=app.namespace)
     div
       a.cover(href='/#{app.namespace}/login')
-        img(src='#{app.image}')
+        if (app.image)
+          img(src='#{app.image}')
+        else
+          img(src='img/default.png')
       div.controls
         if lifegraphConnected
           if !app.connected
@@ -29,7 +32,7 @@ block content
   div.header
     p 
       b#lifegraph-connect Lifegraph Connect
-      |  Securely link your physical identity with your Facebook identity.
+      |  Securely link your physical identity with your Facebook identity. 
       if (lifegraphConnected)
         span.right
           if (fbuser && fbuser.name)
@@ -71,4 +74,5 @@ block content
       hr
       #footer
         a#admin-link(href='/admin') Developer? Admin your apps
-            
+        br
+        a#lifegraphlabs-link(href='http://lifegraphlabs.com') WANT TO KNOW MORE about Lifegraph?

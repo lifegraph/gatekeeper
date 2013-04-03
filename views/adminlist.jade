@@ -6,13 +6,23 @@ block head
 
 block content
   .container-fluid
-    h2 Facebook Apps you can add to Lifegraph Connect
-    ul#fbapps
-      each app in apps
-        li 
-          a(href="/#{app.namespace}/admin") #{app.name}
-    div See these apps on your 
-      a(href="https://developers.facebook.com/apps") Facebook Developers Apps page
+    if apps.length
+      h3 Facebook Applications you can add to Lifegraph Connect
+      ul#fbapps
+        each app in apps
+          li 
+            a(href="/#{app.namespace}/admin") #{app.name}
+      div See your Facebook apps on your 
+        a(href="https://developers.facebook.com/apps") Facebook Developers Apps page
+    else
+      h3 You haven't made any Facebook Applications yet.
+      div You can visit the 
+        a(href="https://developers.facebook.com/apps") Facebook Developers page
+        |  to get started with making Facebook apps.
+    br
+    div Check out 
+      a(href="http://lifegraphlabs.com/how-to") Lifegraph Labs How-To's
+      |  to connect a physical button to Facebook in 20 minutes.
     hr
     div
       a(href="/") Home

@@ -187,3 +187,8 @@ body {
 .bottomSpace { /* We need sass for constants */
   margin-bottom: 15px;
 }
+
+#about {
+  font-size: 15px;
+  color: #A0A0F0;
+}
