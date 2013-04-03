@@ -361,11 +361,10 @@ exports.revokeAccess = function (req, res) {
  */
 
  exports.getAuthToken = function (req, res) {
-  if ((req.app.get('fbapp') != req.params.fbapp) || 
-    (typeof(helper.getSessionId(req)) == "undefined")) {
+  if ((typeof(helper.getSessionId(req)) == "undefined")) {
     return res.redirect('/');
   }
-  database.getApiConfig(req.app.get('fbapp'), function (err, lgconfig) {
+  // database.getApiConfig(req.app.get('fbapp'), function (err, lgconfig) {
     database.getAuthTokens(req.app.get('fbapp'), helper.getSessionId(req), function (err, lgtokens) {
       helper.getUser(req, lgtokens, function(err, fbuser) {
         res.render('authToken', { 
@@ -377,7 +376,7 @@ exports.revokeAccess = function (req, res) {
         });
       });
     });
-  });
+  // });
  }
 
 
