@@ -1,0 +1,32 @@
+extends layout
+
+
+block head
+  title= title
+  link(rel='stylesheet', href='/css/style.css')
+
+block content
+  include header
+  div.container-fluid#about-content
+    h1 We ❤ Hardware + Social
+    p Lifegraph exists to connect physical hardware projects to online virtual identities.
+    h2 You can do it right now.
+    p Get started with some 
+     a(href="http://www.lifegraphlabs.com/how-to") tutorials
+     | . You can get a hardware button that posts to your Facebook wall 
+     a(href="https://github.com/lifegraph/graphbutton-wifly") in under 20 minutes.
+    h2 We are working on making the world a better place, filled with your ideas.
+    p Want to make a frisbee that knows who threw it to identify patterns later? How about an alarm clock that shows you who else is awake for your morning class? Anything is possible with Lifegraph, including 
+      a(href='https://github.com/lifegraph/musicparty') a tap-to-play social musicparty device that streams your favorite music with a tap of your wallet?
+    h2 We do the hard parts.
+    p From 
+      a(href="https://github.com/lifegraph/arduino-wifi-setup") setting up the hardware
+      |  to maintaining the link between physical (RFID card) and virtual (Facebook) identity, with Lifegraph, hardware is no longer so hard.
+    h2 Finally, get immersed in your world.
+    p Lifegraph Connect provides for free a place to sync a physical ID, authenticate with different physical apps that need your info, and find new devices to interact with. We do the heavy lifting, you take the fame.
+
+    h1 What does Lifegraph Connect do?
+    ul
+      li People can manage their physical IDs and access given to applications.
+      li Developers have the tools needed to get their physical device knowing who is using it to personalize or share.
+      li Everyone gets a better experience. Cool ideas actually happen.

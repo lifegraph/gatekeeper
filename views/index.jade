@@ -30,24 +30,7 @@ block head
   link(rel='stylesheet', href='/css/style.css')
 
 block content
-  div.header
-    p 
-
-      b#lifegraph-connect Lifegraph 
-        img#logo(src='/img/hand.png', width='20px')
-        |  Connect
-      |  Securely link your physical identity with your Facebook identity. 
-      a#learn-more(href="/lifegraph/about") Learn More
-      if (lifegraphConnected)
-        span.right
-          if (fbuser && fbuser.name)
-            span#hey-name
-              b Hey #{fbuser.name}! 
-            a#logout-link(href='/logout') Not you? Logout
-          else
-            a#logout-link(href='/logout') Logout
-      else
-        a#login-link.right(href="/#{lifegraphNamespace}/login") Login to Lifegraph Connect
+  include header
 
   div.container-fluid
     if lifegraphConnected
@@ -75,9 +58,4 @@ block content
             +app(app) 
             if (i + 1 < apps.length)
               +app(apps[i+1])
-    if lifegraphConnected
-      hr
-      #footer
-        a#admin-link(href='/admin') Developer? Admin your apps
-        br
-        a#lifegraphlabs-link(href='http://lifegraphlabs.com') WANT TO KNOW MORE about Lifegraph?
+    include footer

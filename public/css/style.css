@@ -215,3 +215,12 @@ body {
   color: #494949;
   font-weight: bold;
 }
+
+#about-content p{
+  font-size: 15px;
+}
+
+#about-content p a{
+  color:black;
+
+}

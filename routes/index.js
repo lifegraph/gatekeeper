@@ -79,7 +79,7 @@ exports.about = function (req, res) {
 
       // Now get the name if we can.
       helper.getUser(req, lgtokens, function(err, fbuser) {
-        res.render('index', {
+        res.render('about', {
           title: 'Lifegraph Connect',
           apps: apis || [],
           devices: (helper.getSessionId(req) && devices) || [],

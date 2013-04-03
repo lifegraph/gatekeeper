@@ -1,0 +1,18 @@
+div.header
+  p 
+    a(href='/')
+      b#lifegraph-connect Lifegraph 
+        img#logo(src='/img/hand.png', width='20px')
+        |  Connect
+    |  Securely link your physical identity with your Facebook identity. 
+    a#learn-more(href="/lifegraph/about") Learn More
+    if (lifegraphConnected)
+      span.right
+        if (fbuser && fbuser.name)
+          span#hey-name
+            b Hey #{fbuser.name}! 
+          a#logout-link(href='/logout') Not you? Logout
+        else
+          a#logout-link(href='/logout') Logout
+    else
+      a#login-link.right(href="/#{lifegraphNamespace}/login") Login to Lifegraph Connect
