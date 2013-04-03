@@ -60,6 +60,7 @@ app.configure('production', function () {
  */
 
 app.get('/', index.lifeGraphSetUpMiddleWare, index.index);
+app.get('/lifegraph/about', index.lifeGraphSetUpMiddleWare, index.about);
 app.get('/logout', index.lifeGraphSetUpMiddleWare, index.logout);
 
 // Admin endpoints

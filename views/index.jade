@@ -7,7 +7,7 @@ mixin app(app)
         if (app.image)
           img(src='#{app.image}')
         else
-          img(src='img/default.png')
+          img(src='/img/default.png')
       div.controls
         if lifegraphConnected
           if !app.connected
@@ -31,8 +31,12 @@ block head
 block content
   div.header
     p 
-      b#lifegraph-connect Lifegraph Connect
+
+      b#lifegraph-connect Lifegraph 
+        img#logo(src='/img/hand.png', width='20px')
+        |  Connect
       |  Securely link your physical identity with your Facebook identity. 
+      a#learn-more(href="/lifegraph/about") Learn More
       if (lifegraphConnected)
         span.right
           if (fbuser && fbuser.name)

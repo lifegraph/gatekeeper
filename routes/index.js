@@ -61,6 +61,39 @@ exports.index = function (req, res) {
 }
 
 /*
+ * GET /lifegraph/about
+ */
+ 
+exports.about = function (req, res) {
+  database.getUserDevices(helper.getSessionId(req), function (err, devices) {
+    database.getApps(req, function (err, apis) {
+      var lifegraphConnected = false, lgtokens;
+      apis = apis.filter(function(app) {
+        if (app.namespace == req.app.get('fbapp')) { // check for the app running this connect server
+          lifegraphConnected = app.connected;
+          lgtokens = app.tokens;
+          return false;
+        }
+        return true;
+      });
+
+      // Now get the name if we can.
+      helper.getUser(req, lgtokens, function(err, fbuser) {
+        res.render('index', {
+          title: 'Lifegraph Connect',
+          apps: apis || [],
+          devices: (helper.getSessionId(req) && devices) || [],
+          lifegraphConnected: lifegraphConnected,
+          lifegraphNamespace: req.app.get('fbapp'),
+          fbid: helper.getSessionId(req),
+          fbuser: fbuser
+        });
+      });
+    });
+  });
+}
+
+/*
  * GET /logout
  * logs out of lifegraph connect
  */

@@ -188,7 +188,11 @@ body {
   margin-bottom: 15px;
 }
 
-#about {
+#learn-more {
   font-size: 15px;
   color: #A0A0F0;
+}
+
+#logo {
+  margin-top:-10px;
 }
