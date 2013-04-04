@@ -41,7 +41,7 @@ exports.index = function (req, res) {
           lgtokens = app.tokens;
           return false;
         }
-        return true;
+        return app.tokens;
       });
 
       // Now get the name if we can.
